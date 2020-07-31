@@ -818,6 +818,7 @@ c		Here is the original version
       ENDIF
       RETURN
       END
+C     END SUBROUTINE TEFUNC
 C
 C=============================================================================
 C
@@ -1308,8 +1309,13 @@ C
       CALL TEFUNC(NN,TIME,YY,YP)
       RETURN
       END
+C     END SUBROUTINE TEINIT
 C
 C=============================================================================
+C     TESUBi - Utility subroutines, i=1,2,..,8
+C
+C-----------------------------------------------------------------------
+C     TESUB1(Z,T,H,ITY)
 C
       SUBROUTINE TESUB1(Z,T,H,ITY)
       DOUBLE PRECISION
@@ -1351,6 +1357,11 @@ C
       ENDIF
       RETURN
       END
+C     END SUBROUTINE TESUB1
+C
+C-----------------------------------------------------------------------
+C     TESUB2(Z,T,H,ITY)
+C
       SUBROUTINE TESUB2(Z,T,H,ITY)
       DOUBLE PRECISION
      .AVP,BVP,CVP,
@@ -1379,6 +1390,11 @@ C
       T=TIN
  300  RETURN
       END
+C     END SUBROUTINE TESUB2
+C
+C-----------------------------------------------------------------------
+C     TESUB3(Z,T,DH,ITY)
+C
       SUBROUTINE TESUB3(Z,T,DH,ITY)
       DOUBLE PRECISION
      .AVP,BVP,CVP,
@@ -1417,6 +1433,11 @@ C
       ENDIF
       RETURN
       END
+C     END SUBROUTINE TESUB3
+C
+C-----------------------------------------------------------------------
+C     TESUB4(X,T,R)
+C
       SUBROUTINE TESUB4(X,T,R)
       DOUBLE PRECISION
      .AVP,BVP,CVP,
@@ -1442,6 +1463,12 @@ C
       R=1.0/V
       RETURN
       END
+C     END SUBROUTINE TESUB4
+C
+C-----------------------------------------------------------------------
+C     TESUB5(S,SP,ADIST,BDIST,CDIST,DDIST,TLAST,
+C    .TNEXT,HSPAN,HZERO,SSPAN,SZERO,SPSPAN,IDVFLAG)
+C
       SUBROUTINE TESUB5(S,SP,ADIST,BDIST,CDIST,DDIST,TLAST,
      .TNEXT,HSPAN,HZERO,SSPAN,SZERO,SPSPAN,IDVFLAG)
       DOUBLE PRECISION
@@ -1474,6 +1501,11 @@ C
       TNEXT=TLAST+H
       RETURN
       END
+C     END SUBROUTINE TESUB5
+C
+C-----------------------------------------------------------------------
+C     TESUB6(STD,X)
+C
       SUBROUTINE TESUB6(STD,X)
       INTEGER I
       DOUBLE PRECISION STD,X,TESUB7
@@ -1484,6 +1516,11 @@ C
 	X=(X-6.D0)*STD
 	RETURN
       END
+C     END SUBROUTINE TESUB6
+C
+C-----------------------------------------------------------------------
+C     TESUB7(I)
+C
       DOUBLE PRECISION FUNCTION TESUB7(I)
       INTEGER I
       DOUBLE PRECISION G,DMOD
@@ -1493,6 +1530,11 @@ C
       IF(I.LT.0)TESUB7=2.D0*G/4294967296.D0-1.D0
       RETURN
       END
+C     END FUNCTION TESUB7
+C
+C-----------------------------------------------------------------------
+C     TESUB8(I,T)
+C
       DOUBLE PRECISION FUNCTION TESUB8(I,T)
       INTEGER  I
       DOUBLE PRECISION  H,T
