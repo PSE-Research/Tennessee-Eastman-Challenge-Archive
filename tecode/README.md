@@ -12,6 +12,7 @@ Basic TEC Code
     + CRLF -> LF
     + Add more comments
     + copy and insert `tecommon.inc`
+    + Adjust indent, keep use f77 format
 
 + `teprob.f90`
 

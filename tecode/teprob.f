@@ -1524,11 +1524,11 @@ C
       INTEGER I
       DOUBLE PRECISION STD,X,TESUB7
       X=0.D0
-	DO I=1,12
-    		X=X+TESUB7(I)
-	end do
-	X=(X-6.D0)*STD
-	RETURN
+      DO I=1,12
+         X=X+TESUB7(I)
+      end do
+      X=(X-6.D0)*STD
+      RETURN
       END
 C     END SUBROUTINE TESUB6
 C
