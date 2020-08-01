@@ -1081,13 +1081,28 @@ End Subroutine teinit
 !     TESUBi - Utility subroutines, i=1,2,..,8
 !
 !-----------------------------------------------------------------------
-!     TESUB1(Z,T,H,ITY)
-!
+!> Update `h`.
+!! 
+!!  ## Input
+!!      @param[in]  `z` 
+!!      @param[in]  `t`
+!!      @param[out] `h`
+!!      @param[in]  `ity`
+!!  ### common: 
+!!      + /const/
+!!
 Subroutine tesub1(z, t, h, ity)
-    Double Precision avp, bvp, cvp, ah, bh, ch, ag, bg, cg, av, ad, bd, cd, xmw
-    Common /const/avp(8), bvp(8), cvp(8), ah(8), bh(8), ch(8), ag(8), bg(8), cg(8), av(8), ad(8), bd(8), cd(8), xmw(8)
+    Double Precision avp, bvp, cvp, &
+        ah, bh, ch, &
+        ag, bg, cg,  av, &
+        ad, bd, cd,  xmw
+    Common /const/ avp(8), bvp(8), cvp(8), &
+        ah(8), bh(8), ch(8), &
+        ag(8), bg(8), cg(8),  av(8), & 
+        ad(8), bd(8), cd(8),  xmw(8)
     Double Precision z(8), r, t, h, hi
     Integer ity, i
+
     If (ity==0) Then
         h = 0.0D0
         Do i = 1, 8
@@ -1104,21 +1119,35 @@ Subroutine tesub1(z, t, h, ity)
             h = h + z(i)*xmw(i)*hi
         End Do
     End If
+
     If (ity==2) Then
         r = 3.57696D0/1.D6
         h = h - r*(t+273.15)
     End If
+
     Return
 End Subroutine tesub1
 
+
 !-----------------------------------------------------------------------
-!     TESUB2(Z,T,H,ITY)
-!
+!> Update `t`.
+!! 
+!!  ## Input
+!!      @param[in]  `z` 
+!!      @param[inout] `t`
+!!      @param[in]  `h`
+!!      @param[in]  `ity`
+!!  ### common: 
+!!      + /const/
+!!
 Subroutine tesub2(z, t, h, ity)
-    Double Precision avp, bvp, cvp, ah, bh, ch, ag, bg, cg, av, ad, bd, cd, xmw
-    Common /const/avp(8), bvp(8), cvp(8), ah(8), bh(8), ch(8), ag(8), bg(8), cg(8), av(8), ad(8), bd(8), cd(8), xmw(8)
+    Double Precision avp, bvp, cvp, ah, bh, ch, &
+        ag, bg, cg, av, ad, bd, cd, xmw
+    Common /const/ avp(8), bvp(8), cvp(8), ah(8), bh(8), ch(8), &
+        ag(8), bg(8), cg(8), av(8), ad(8), bd(8), cd(8), xmw(8)
     Integer ity, j
     Double Precision z(8), t, h, tin, htest, err, dh, dt
+
     tin = t
     Do j = 1, 100
         Call tesub1(z, t, htest, ity)
@@ -1129,17 +1158,34 @@ Subroutine tesub2(z, t, h, ity)
         If (dabs(dt)<1.D-12) Goto 300
     End Do
     t = tin
-    300 Return
+
+300 Return
 End Subroutine tesub2
 
+
 !-----------------------------------------------------------------------
-!     TESUB3(Z,T,DH,ITY)
-!
+!> Update `dh`.
+!! 
+!!  ## Input
+!!      @param[in] `z` 
+!!      @param[in] `t`
+!!      @param[inout] `dh`
+!!      @param[in] `ity`
+!!  ### common: 
+!!      + /const/
+!!
 Subroutine tesub3(z, t, dh, ity)
-    Double Precision avp, bvp, cvp, ah, bh, ch, ag, bg, cg, av, ad, bd, cd, xmw
-    Common /const/avp(8), bvp(8), cvp(8), ah(8), bh(8), ch(8), ag(8), bg(8), cg(8), av(8), ad(8), bd(8), cd(8), xmw(8)
+    Double Precision avp, bvp, cvp, &
+        ah, bh, ch, &
+        ag, bg, cg,  av, &
+        ad, bd, cd,  xmw
+    Common /const/ avp(8), bvp(8), cvp(8), &
+        ah(8), bh(8), ch(8), &
+        ag(8), bg(8), cg(8),  av(8), &
+        ad(8), bd(8), cd(8),  xmw(8)
     Integer ity, i
     Double Precision z(8), r, t, dh, dhi
+
     If (ity==0) Then
         dh = 0.0D0
         Do i = 1, 8
@@ -1155,86 +1201,143 @@ Subroutine tesub3(z, t, dh, ity)
             dh = dh + z(i)*xmw(i)*dhi
         End Do
     End If
+
     If (ity==2) Then
         r = 3.57696D0/1.D6
         dh = dh - r
     End If
+
     Return
 End Subroutine tesub3
 
+
 !-----------------------------------------------------------------------
-!     TESUB4(X,T,R)
-!
+!> Update `r`.
+!! 
+!!  ## Input
+!!      @param[in] `x` 
+!!      @param[in] `t`
+!!      @param[inout] `r`
+!!  ### common: 
+!!      + /const/
+!!
 Subroutine tesub4(x, t, r)
-    Double Precision avp, bvp, cvp, ah, bh, ch, ag, bg, cg, av, ad, bd, cd, xmw
-    Common /const/avp(8), bvp(8), cvp(8), ah(8), bh(8), ch(8), ag(8), bg(8), cg(8), av(8), ad(8), bd(8), cd(8), xmw(8)
+    Double Precision avp, bvp, cvp, ah, bh, ch, ag, bg, cg, av, &
+        ad, bd, cd,  xmw
+    Common /const/ avp(8), bvp(8), cvp(8), ah(8), bh(8), ch(8), &
+        ag(8), bg(8), cg(8),  av(8), &
+        ad(8), bd(8), cd(8),  xmw(8)
     Double Precision v, r, x(8), t
     Integer i
+
     v = 0.0
     Do i = 1, 8
         v = v + x(i)*xmw(i)/(ad(i)+(bd(i)+cd(i)*t)*t)
     End Do
     r = 1.0/v
+
     Return
 End Subroutine tesub4
 
+
 !-----------------------------------------------------------------------
-!     TESUB5(S,SP,ADIST,BDIST,CDIST,DDIST,TLAST,
-!    .TNEXT,HSPAN,HZERO,SSPAN,SZERO,SPSPAN,IDVFLAG)
-!
-Subroutine tesub5(s, sp, adist, bdist, cdist, ddist, tlast, tnext, hspan, hzero, sspan, szero, spspan, idvflag)
-    Double Precision s, sp, h, s1, s1p, adist, bdist, cdist, ddist, tlast, tnext, hspan, hzero, sspan, szero, spspan, tesub7
+!> Update `[a-d]dist` and `tnext`.
+!! 
+!!  ## Input
+!!      @param[in] `s, sp`
+!!      @param[in] `hspan, hzero`
+!!      @param[in] `sspan, szero`
+!!      @param[in] `spspan`
+!!      @param[in] `idvflag`
+!!      @param[in] `tlast`
+!!      @param[out] `adist, bdist, cdist, ddist`
+!!      @param[out] `tnext`
+Subroutine tesub5(s, sp,  adist, bdist, cdist, ddist,   tlast, tnext, &
+        hspan, hzero,   sspan, szero,   spspan, idvflag)
+! ----------------------------------------------------------------------
+    Double Precision s, sp, h, s1, s1p,   adist, bdist, cdist, ddist, &
+        tlast, tnext,   hspan, hzero,   sspan, szero,   spspan, tesub7
     Integer i, idvflag
+
     i = -1
     h = hspan*tesub7(i) + hzero
     s1 = sspan*tesub7(i)*idvflag + szero
     s1p = spspan*tesub7(i)*idvflag
+
     adist = s
     bdist = sp
     cdist = (3.D0*(s1-s)-h*(s1p+2.D0*sp))/h**2
     ddist = (2.D0*(s-s1)+h*(s1p+sp))/h**3
     tnext = tlast + h
+
     Return
 End Subroutine tesub5
 
+
 !-----------------------------------------------------------------------
-!     TESUB6(STD,X)
-!
+!> Update `x`.
+!! 
+!!  ## Input
+!!      @param[in] `std`
+!!      @param[out] `x`
+!!
 Subroutine tesub6(std, x)
     Integer i
     Double Precision std, x, tesub7
+
     x = 0.D0
     Do i = 1, 12
         x = x + tesub7(i)
     End Do
     x = (x-6.D0)*std
+
     Return
 End Subroutine tesub6
 
+
 !-----------------------------------------------------------------------
-!     TESUB7(I)
-!
+!> Return random number.
+!! 
+!!  ## Input
+!!      @param[in] `i` flag
+!!  ### commom
+!!      + `/randsd/ g`
+!!
 Double Precision Function tesub7(i)
     Integer i
     Double Precision g, dmod
     Common /randsd/g
+
     g = dmod(g*9228907.D0, 4294967296.D0)
     If (i>=0) tesub7 = g/4294967296.D0
     If (i<0) tesub7 = 2.D0*g/4294967296.D0 - 1.D0
+
     Return
 End Function tesub7
 
+
 !-----------------------------------------------------------------------
-!     TESUB8(I,T)
-!
+!> Return dist?
+!! 
+!!  ## Input
+!!      @param[in] `i`
+!!      @param[in] `t`
+!!  ### commom
+!!      + `/wlk/`
+!!
 Double Precision Function tesub8(i, t)
     Integer i
     Double Precision h, t
     Integer idvwlk
-    Double Precision adist, bdist, cdist, ddist, tlast, tnext, hspan, hzero, sspan, szero, spspan
-    Common /wlk/adist(12), bdist(12), cdist(12), ddist(12), tlast(12), tnext(12), hspan(12), hzero(12), sspan(12), szero(12), spspan(12), idvwlk(12)
+    Double Precision adist, bdist, cdist, ddist,  tlast, &
+        tnext, hspan, hzero, sspan, szero, spspan
+    Common /wlk/ adist(12), bdist(12), cdist(12), ddist(12), &
+        tlast(12), tnext(12), hspan(12), hzero(12), sspan(12), &
+        szero(12), spspan(12), idvwlk(12)
+
     h = t - tlast(i)
     tesub8 = adist(i) + h*(bdist(i)+h*(cdist(i)+h*ddist(i)))
+
     Return
 End Function tesub8
 
