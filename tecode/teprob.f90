@@ -207,7 +207,17 @@ Subroutine tefunc(nn, time, yy, yp)
 !           YP   = Current derivative values
 !
   Double Precision yy(nn), yp(nn)
-  Invlude 'TEcommon.inc'
+!
+!  MEASUREMENT AND VALVE COMMON BLOCK
+!
+  Double Precision xmeas, xmv
+  Integer isd
+  Common /pv/xmeas(41), xmv(12), isd
+!
+!   DISTURBANCE VECTOR COMMON BLOCK
+!
+  Integer idv
+  Common /dvec/idv(20)
   Double Precision uclr, ucvr, utlr, utvr, xlr, xvr, etr, esr, tcr, tkr, dlr, vlr, vvr, vtr, ptr, ppr, crxr, rr, rh, fwr, twr, qur, hwr, uar, ucls, ucvs, utls, utvs, xls, xvs, ets, ess, tcs, tks, dls, vls, vvs, vts, pts, pps, fws, tws, qus, hws, uclc, utlc, xlc, etc, esc, tcc, dlc, vlc, vtc, quc, ucvv, utvv, xvv, etv, esv, tcv, tkv, vtv, ptv, vcv, vrng, vtau, ftm, fcm, xst, xmws, hst, tst, sfr, cpflmx, cpprmx, cpdh, tcwr, tcws, htr, agsp, xdel, xns, tgas, tprod, vst
   Integer ivst
   Common /teproc/uclr(8), ucvr(8), utlr, utvr, xlr(8), xvr(8), etr, esr, tcr, tkr, dlr, vlr, vvr, vtr, ptr, ppr(8), crxr(8), rr(4), rh, fwr, twr, qur, hwr, uar, ucls(8), ucvs(8), utls, utvs, xls(8), xvs(8), ets, ess, tcs, tks, dls, vls, vvs, vts, pts, pps(8), fws, tws, qus, hws, uclc(8), utlc, xlc(8), etc, esc, tcc, dlc, vlc, vtc, quc, ucvv(8), utvv, xvv(8), etv, esv, tcv, tkv, vtv, ptv, vcv(12), vrng(12), vtau(12), ftm(13), fcm(8, 13), xst(8, 13), xmws(13), hst(13), tst(13), sfr(8), cpflmx, cpprmx, cpdh, tcwr, tcws, htr(3), agsp, xdel(41), xns(41), tgas, tprod, vst(12), ivst(12)

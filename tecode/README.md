@@ -3,8 +3,17 @@ Basic TEC Code
 
 ## Change log
 
-+ CRLF -> LF
-+ Add readme.md
++ About files
+    + Add readme.md
+    + Add f90 version of `teprob.f`: teprob.f90
+    + Remove `tecommon.inc`, Merge its content into `teprob.f`.
+
++ `teprob.f`
+    + CRLF -> LF
+    + Add more comments
+    + copy and insert `tecommon.inc`
+
++ `teprob.f90`
 
 
 ## Original notes
