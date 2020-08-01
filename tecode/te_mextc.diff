@@ -1,0 +1,769 @@
+diff --git a/te_mex.fv3 b/te_mextc.fv4
+index a91e848..83fad6c 100644
+--- a/te_mex.fv3
++++ b/te_mextc.fv4
+@@ -7,128 +7,30 @@ c	Seattle, WA 98195
+ 
+ c	E-mail:  ricker@cheme.washington.edu
+ 
+-C	This is a standard Matlab system function in the format required by
+-c	SIMULINK and the associated analysis and integration routines.  It has
+-c	50 states, 12 inputs, and 41 outputs.  See the paper by Downs and Vogel
+-c	for an explanation of these variables.
++c	This version replaces inputs 10 and 11 with TC setpoints for
++c	the reactor and separator, respectively.
++c	There are a total of 51 outputs.  The "extra" ones are:
+ 
+-c	In addition to the standard input arguments (time, states, inputs, flag),
+-c	you must supply 4 parameters, as follows:
+-
+-c	p1	idv(20)  -- a vector of length 20 containing the desired values of
+-c		the disturbance flags (see paper by Downs and Vogel).
+-
+-c		The following are all used by the TE routines to save data between
+-c		Matlab calls.  They are initialized by a call to this function with
+-c		time<0 and flag=0.  You must create Matlab variables of the 
+-c		appropriate size (a vector of zeros is convenient),
+-c		and pass them to te_mex as input arguments.
+-
+-c	p2	Vector of length 153
+-c	p3	Vector of length 586
+-c	p4	Vector of length 139
+-
+-c	Here are some example calls from Matlab:
+-
+-c	t=-1;
+-c	x=[];
+-c	u=[];
+-c	flag=0;
+-c	idv=zeros(20,1);
+-c	p2=zeros(153,1);
+-c	p3=zeros(586,1);
+-c	p4=zeros(139,1);
+-c	x0=te_mex(t,x,u,flag,idv,p2,p3,p4);
+-	
+-c	u=[specify a vector, length 12];
+-c	flag=1;
+-c	t=0;
+-c	dxdt=te_mex(t,x0,u,flag,idv,p2,p3,p4);
+-c	flag=3;
+-c	y=te_mex(t,x0,u,flag,idv,p2,p3,p4);
+-
+-c	The first call to te_mex initializes the storage vectors, p2 to p4, and
+-c	returns the initial state vector in x0. 
+-
+-c	The second call to te_mex calculates the time-derivatives of the states
+-c	at the initial conditions (x0) and for a set of inputs that you must specify
+-c	(in the "u" vector).
+-
+-c	The third call to te_mex returns the values of the outputs (all 41 of them -
+-c	see paper by Downs and Vogel) for the given x0 and u.
+-
+-c	The following sequence of Matlab statements should reproduce the graphs
+-c	shown in Figure 3 of Downs and Vogel:
+-
+-c	idv=zeros(20,1);
+-c	p2=zeros(153,1);
+-c	p3=zeros(586,1);
+-c	p4=zeros(139,1);
+-c	[sys,x0]=te_mex(-1,[],[],0,idv,p2,p3,p4);
+-c	u0=[63.53,  53.98, 24.644, 61.302, 22.21, ...
+-c	    40.064, 38.1,  46.534, 47.446, 41.106, ...
+-c	    18.114, 50];       % Base case inputs (XMV variables).
+-c	u0(10)=38;             % Specifies a step in XMV(10)
+-c	tvec=[0; 0.3];         % Starting and ending time.
+-c	ut=[tvec [u0;u0] ];    % Specifies constant inputs.
+-c	options=[.001, .00001, .001, 0, 0, 0, 0];
+-c	[tt,xt,yt]=rk45('te_mex',tvec,x0,options,ut,idv,p2,p3,p4);
+-
+-c	clg
+-c	subplot(221)
+-c	plot(tt,yt(:,6)),title('Reactor Feed'),xlabel('Time (hours)')
+-c	subplot(222)
+-c	plot(tt,yt(:,7)),title('Reac Pressure'),xlabel('Time (hours)')
+-c	subplot(223)
+-c	plot(tt,yt(:,8)),title('Reac Level'),xlabel('Time (hours)')
+-c	subplot(224)
+-c	plot(tt,yt(:,9)),title('Reac Temp'),xlabel('Time (hours)')
+-c	pause
+-
+-c	clg
+-c	subplot(221)
+-c	plot(tt,yt(:,11)),title('Prod Sep Temp'),xlabel('Time (hours)')
+-c	subplot(222)
+-c	plot(tt,yt(:,12)),title('Prod Sep Level'),xlabel('Time (hours)')
+-c	subplot(223)
+-c	plot(tt,yt(:,10)),title('Purge Rate'),xlabel('Time (hours)')
+-c	subplot(224)
+-c	plot(tt,yt(:,18)),title('Stripper Temp'),xlabel('Time (hours)')
+-c	pause
+-
+-c	I found that a specification of a maximum step size of about 0.001
+-c	was necessary to get reliable accuracy from the Matlab integration
+-c	package (see use of "options" variable, above).  Other settings
+-c	may give better performance.  I didn't experiment with it too much.
+-c	Elapsed time for the integration was about 1 minute on a Mac IIfx.
+-
+-c	The following additional commands show how the concentrations
+-c	from the analyzers vary with time.  You can observe the discrete
+-c	sampling behavior, e.g., the product concentrations vary every 0.25
+-c	hours, and the others vary every 0.1 hours.
+-
+-c	clg
+-c	subplot(221)
+-c	plot(tt,yt(:,23)),title('A in Feed'),xlabel('Time (hours)')
+-c	subplot(222)
+-c	plot(tt,yt(:,30)),title('B in Purge'),xlabel('Time (hours)')
+-c	subplot(223)
+-c	plot(tt,yt(:,40)),title('G in Product'),xlabel('Time (hours)')
+-c	subplot(224)
+-c	plot(tt,yt(:,41)),title('H in Product'),xlabel('Time (hours)')
+-
+-c	Many other uses of te_mex should be obvious to those familiar with
+-c	the analysis tools in SIMULINK and the various Matlab toolboxes.
++c	42	Operating cost [cents/kmol product]
++c	43	Rate of reaction 1 [kmol G produced/h]
++c	44	Rate of reaction 2 [kmol H produced/h]
++c	45	Rate of generation of F in reactions 3 and 4 [kmol F produced/h]
++c	46	Partial pressure of A in reactor [kPa]
++c	47	Partial pressure of C in reactor [kPa]
++c	48	Partial pressure of D in reactor [kPa]
++c	49	Partial pressure of E in reactor [kPa]
++c	50	True (delay and noise-free) mole % G in product (stream 11)
++c	51	True (delay and noise-free) mole % H in product (stream 11)
+ 
+ C---------------------------------------------------------------------
+ 
+-      SUBROUTINE USRFCN(NLHS, PLHS, NRHS, PRHS)
++      SUBROUTINE mexFunction(NLHS, PLHS, NRHS, PRHS)
+       INTEGER PLHS(*), PRHS(*)
+       INTEGER NLHS, NRHS
+ C
+-      INTEGER CRTMAT, REALP, IMAGP, GETGLO, ALREAL, ALINT, GETSTR
++      INTEGER mxCreateFull, mxGetPr, mxGetPi, mexGetMatrixPtr
+ C
+-      DOUBLE PRECISION GETSCA
++      DOUBLE PRECISION mxGetScalar
+ C
+ C THE ABOVE SUBROUTINE, ARGUMENT, AND FUNCTION DECLARATIONS ARE STANDARD
+ C IN ALL FORTRAN MEX FILES.
+@@ -140,39 +42,50 @@ c	The following will hold pointers:
+ 	integer t,x,u,flag,p1,p2,p3,p4
+ 
+ c		The following are local variables.  In this case we know
+-c		that there will be 50 continuous states, 12 inputs, and 41 outputs.
++c		that there will be 52 continuous states, 12 inputs, and 51 outputs.
+ c		These values are specified by the parameters nx, nu, and ny,
+ c		respectively.  Also define corresponding character constants
+ c		lenx, lenu, to use in error messages, and double precision
+ c		constants for the SIZES vector.
+ 
+-	integer iflag,m,n,nx,nu,ny
++	integer iflag,m,n,nx,nu,ny,nTE
+ 	character*(*) lenu,lenx
+ 	double precision dnx, dnu, dny
+-	parameter (nx=50, nu=12, ny=41, lenx='50', lenu='12', dnx=50.,
+-     +		dnu=12.,dny=41.)
++	parameter (nx=52, nu=12, ny=51, lenx='52', lenu='12', dnx=52.,
++     +		dnu=12.,dny=51.)
+ 	
+ 	
+-	double precision 	rx(nx),rx0(nx),dxdt(nx),sizes(6),rt
++	double precision 	rx(nx),rx0(nx),dxdt(nx),sizes(6),rt,didv(21)
+ 
+ c		The states, inputs, and outputs are arranged as explained in the
+ c		paper by Downs and Vogel.  The following is the standard 
+ c		common block definition used as a user interface to the TE
+ c		routines.
+ 
++C  MEASUREMENT AND VALVE COMMON BLOCK
++C
+       DOUBLE PRECISION XMEAS, XMV
+-	integer isd
+-      COMMON/PV/ XMEAS(41), XMV(12), isd
++      COMMON/PV/ XMEAS(51), XMV(12)
+ C
+ C   DISTURBANCE VECTOR COMMON BLOCK
+ C
+-      INTEGER IDV
+-	double precision didv(20)  	! For temporary storage of IDV.
+-      COMMON/DVEC/ IDV(20)
++      INTEGER IDV,isd
++      COMMON/DVEC/ IDV(21)
++	equivalence (idv(21),isd)
++	
++c	NOTE: I have included isd in the /IDV/ common.  This is set
++c		non-zero when the process is shutting down.
++c		Output XMEAS(42) is for cost [cents/kmol product].
++c		Output XMEAS(43) is production rate of G [kmol G generated/h]
++c		Output XMEAS(44) is production rate of H [kmol H generated/h]
++c		Output XMEAS(45) is production rate of F [kmol F generated/h]
++c		Output XMEAS(46) is partial pressure of A in reactor [kPa]
++c		Output XMEAS(47) is partial pressure of C in reactor [kPa]
++c		Output XMEAS(48) is partial pressure of D in reactor [kPa]
++c		Output XMEAS(49) is partial pressure of E in reactor [kPa]
++c		Output XMEAS(50) is true (delay free) mole % G in product
++c		Output XMEAS(51) is true (delay free) mole % H in product
+ 	
+-c	NOTE: I have included isd in the PV column.  This is set
+-c		to -1 when the process is shutting down.
+-
+ c	In addition, must include all the other common areas, so data can
+ c	be saved in Matlab between calls.
+ 
+@@ -202,69 +115,77 @@ c		to output.
+ c		Check the number of input arguments
+ 
+ 	if (nrhs .ne. 8) then
+-		call mexerr('TE_mex needs 8 input variables.')
++		call mexErrMsgTxt('TE_mex_TC needs 8 input variables.')
+ 	else
+ 
+ c			There are 8 input arguments.  Set pointers and copy the
+ c			inputs to local storage.
+ 
+-		call getsiz(prhs(1),m,n)		! Get size of "t" array.
++		m=mxGetM(prhs(1))		! Get size of "t" array.
++		n=mxGetN(prhs(1))
+ 		if (m.gt.0 .and. n.gt.0) then		! If it's non-empty...
+-			rt=getsca(prhs(1))		! gets time value (a scalar).
++			rt=mxGetScalar(prhs(1))		! gets time value (a scalar).
+ 		else
+ 			rt=0.0				! Otherwise set to zero.
+ 		end if
+ 		
+-		call getsiz(prhs(4),m,n)		! "flag"
++		m=mxGetM(prhs(4))		! Get size of "flag" array.
++		n=mxGetN(prhs(4))
+ 		if (m.gt.0 .and. n.gt.0) then
+ 			if (m.eq.1 .and. n.eq.1) then
+-				iflag=abs(nint(getsca(prhs(4))))
++				iflag=abs(nint(mxGetScalar(prhs(4))))
+ 			else
+-				call mexerr('FLAG must be a scalar.')
++				call mexErrMsgTxt('FLAG must be a scalar.')
+ 			end if
+ 		else
+ 			iflag=0
+ 		end if
+ 			
+-		call getsiz(prhs(2),m,n)		! "x" vector.
++		m=mxGetM(prhs(2))		! Get size of "x" array.
++		n=mxGetN(prhs(2))
+ 		if (m.gt.0 .and. n.gt.0) then		
+ 			if (min(m,n).ne.1 .or. max(m,n) .ne. nx) then	
+-				call mexerr('X must be a vector, length '//lenx)
++				call mexErrMsgTxt
++     +			('X must be a vector, length '//lenx)
+ 			end if
+-			x=realp(prhs(2))
+-			call cpout(x,rx,nx)		! copy x into local storage
++			x=mxGetPr(prhs(2))
++			call mxCopyPtrToReal8(x,rx,nx)		! copy x into local storage
+ 		else if (iflag.eq.1 .or. iflag.eq.3) then
+-			call mexerr('X must be supplied.')
++			call mexErrMsgTxt('X must be supplied.')
+ 		end if
+ 	
+ 			
+-		call getsiz(prhs(3),m,n)		! "u" vector.
++		m=mxGetM(prhs(3))		! Get size of "u" array.
++		n=mxGetN(prhs(3))
+ 		if (m.gt.0 .and. n.gt.0) then		
+ 			if (min(m,n).ne.1 .or. max(m,n) .ne. nu) then	
+-				call mexerr('U must be a vector, length '//lenu)
++				call mexErrMsgTxt
++     +			('U must be a vector, length '//lenu)
+ 			end if
+-			u=realp(prhs(3))
+-			call cpout(u,xmv,nu)		! copy u into local storage
++			u=mxGetPr(prhs(3))
++			call mxCopyPtrToReal8(u,xmv,nu)		! copy u into local storage
+ 		else if (iflag.eq.1 .or. iflag.eq.3) then
+-			call mexerr('U must be supplied.')
++			call mexErrMsgTxt('U must be supplied.')
+ 		end if
+ 		
+-		call getsiz(prhs(5),m,n)		! IDV
+-		if (m.eq.1 .and. n.eq.20 .or. m.eq.20 .and. n.eq.1) then
+-			p1=realp(prhs(5))
+-			call cpout(p1,didv,20)		! copy IDV to local REAL*8 array 
+-			do i=1,20
++		m=mxGetM(prhs(5))		! Get size of "t" array.
++		n=mxGetN(prhs(5))
++		if (m.eq.1 .and. n.eq.21 .or. m.eq.21 .and. n.eq.1) then
++			p1=mxGetPr(prhs(5))
++			call mxCopyPtrToReal8(p1,didv,21)		! copy IDV to local REAL*8 array 
++			do i=1,21
+ 				idv(i)=nint(didv(i))	! convert to integer
+ 			end do
+ 		else
+-			call mexerr('P1 must be a vector, length 20.')
++			call mexErrMsgTxt('P1 must be a vector, length 21.')
+ 		end if
+ 	
+ 				
+-		call getsiz(prhs(6),m,n)		! P2
++		m=mxGetM(prhs(6))		! Get size of "P2" array.
++		n=mxGetN(prhs(6))
+ 		if (m.eq.1 .and. n.eq.153 .or. m.eq.153 .and. n.eq.1) then
+-			p2=realp(prhs(6))
+-			call cpout(p2,dp2tmp,153)		! copy P2 into temporary storage
++			p2=mxGetPr(prhs(6))
++			call mxCopyPtrToReal8(p2,dp2tmp,153)		! copy P2 into temporary storage
+ 			do i=1,112
+ 				dp2(i)=dp2tmp(i)			! Load common /CONST/
+ 			end do
+@@ -272,24 +193,26 @@ c			inputs to local storage.
+ 				xmeas(i)=dp2tmp(i+112)		! Load old XMEAS(i) values 
+ 			end do
+ 		else
+-			call mexerr('P2 must be a vector, length 153.')
++			call mexErrMsgTxt('P2 must be a vector, length 153.')
+ 		end if
+ 
+-		call getsiz(prhs(7),m,n)		! P3
++		m=mxGetM(prhs(7))		! Get size of "P3" array.
++		n=mxGetN(prhs(7))
+ 		if (m.eq.1 .and. n.eq.586 .or. m.eq.586 .and. n.eq.1) then
+-			p3=realp(prhs(7))
+-			call cpout(p3,dp3,586)		! copy P3 into common /TEPROC/ 
++			p3=mxGetPr(prhs(7))
++			call mxCopyPtrToReal8(p3,dp3,586)		! copy P3 into common /TEPROC/ 
+ 		else
+-			call mexerr('P3 must be a vector, length 586.')
++			call mexErrMsgTxt('P3 must be a vector, length 586.')
+ 		end if
+ 
+-		call getsiz(prhs(8),m,n)		! P4
++		m=mxGetM(prhs(8))		! Get size of "P4" array.
++		n=mxGetN(prhs(8))
+ 		if (m.eq.1 .and. n.eq.139 .or. m.eq.139 .and. n.eq.1) then
+-			p4=realp(prhs(8))
+-			call cpout(p4,dp4,139)		! copy P4 into common /WLK/ 
++			p4=mxGetPr(prhs(8))
++			call mxCopyPtrToReal8(p4,dp4,139)		! copy P4 into common /WLK/ 
+ 			G_dum=dp4(139)			! also initialize /RANDSD/
+ 		else
+-			call mexerr('P4 must be a vector, length 139.')
++			call mexErrMsgTxt('P4 must be a vector, length 139.')
+ 		end if
+ 
+ 	end if
+@@ -355,245 +278,65 @@ c			Default state vector
+ 	      rx0(48)=41.10581288
+ 	      rx0(49)=18.11349055
+ 	      rx0(50)=50.00000000
++		rx0(51)=0.0						! PI controller integral error states
++		rx0(52)=0.0
+ 
+-		plhs(1)=crtmat(6,1,0)				! "sizes"
+-		call cpin(sizes,realp(plhs(1)),6)
++		plhs(1)=mxCreateFull(6,1,0)				! "sizes"
++		call mxCopyReal8ToPtr(sizes,mxGetPr(plhs(1)),6)
+ 		if (nlhs.gt.1) then
+-			plhs(2)=crtmat(nx,1,0)			! "x0"
+-			call cpin(rx0,realp(plhs(2)),nx)
++			plhs(2)=mxCreateFull(nx,1,0)			! "x0"
++			call mxCopyReal8ToPtr(rx0,mxGetPr(plhs(2)),nx)
+ 		end if
+ 		if (nlhs.gt.2) then
+-			plhs(3)=crtmat(0,0,0)			! "xstr" (empty)
++			plhs(3)=mxCreateFull(0,0,0)			! "xstr" (empty)
+ 		end if
+ 		
+ 	else if (iflag.eq.1 .or. iflag.eq.3) then
+ 	
+ 		call TEFUNC(nx,rt,rx,dxdt)    	! Uses value of x from Matlab
+-     		if (isd.lt.0) then
+-			call mexerr('SHUTTING DOWN!')
+-		end if
+ 
+ 		if (iflag.eq.1) then
+-			plhs(1)=crtmat(nx,1,0)
+-			call cpin(dxdt,realp(plhs(1)),nx)  		! returns dxdt to Matlab
++			plhs(1)=mxCreateFull(nx,1,0)
++			call mxCopyReal8ToPtr(dxdt,mxGetPr(plhs(1)),nx)  		! returns dxdt to Matlab
+ 		else
+-			plhs(1)=crtmat(ny,1,0)
+-			call cpin(xmeas,realp(plhs(1)),ny)  	! returns y to Matlab
++			plhs(1)=mxCreateFull(ny,1,0)
++			prate=211.3*rx(46)/46.534 + 1.0d-6				! product rate (kmol/h)
++			xmeas(42)=100*(0.0536*xmeas(20) + 0.0318*xmeas(19) 
++     +			+ xmeas(10)*0.44791*(2.209*xmeas(29)
++     +	 		+ 6.177*xmeas(31) + 22.06*xmeas(32)
++     +	 		+ 14.56*xmeas(33) + 17.89*xmeas(34) 
++     +	 		+ 30.44*xmeas(35) + 22.94*xmeas(36)) 
++     +			+ prate*(0.2206*xmeas(37) +
++     +	 		0.1456*xmeas(38) + 0.1789*xmeas(39)))/prate	! cost [cents/kmol]
++
++			call mxCopyReal8ToPtr(xmeas,mxGetPr(plhs(1)),ny)  	! returns y to Matlab
+ 		end if		
+ 	else
+ 
+ c			For all other flags, return an empty matrix.	
+ 
+-		plhs(1)=crtmat(0,0,0)
++		plhs(1)=mxCreateFull(0,0,0)
+ 	
+ 	end if
+ 	
+ c		Save TEPROB common areas in Matlab memory.
+ 
++	didv(21)=isd
++	call mxCopyReal8ToPtr(didv,p1,21)
+ 	do i=1,112
+ 		dp2tmp(i)=dp2(i)
+ 	end do
+ 	do i=1,41
+ 		dp2tmp(i+112)=xmeas(i)
+ 	end do
+-	call cpin(dp2tmp,p2,153)
+-	call cpin(dp3,p3,586)
++	call mxCopyReal8ToPtr(dp2tmp,p2,153)
++	call mxCopyReal8ToPtr(dp3,p3,586)
+ 	dp4(139)=G_dum
+-	call cpin(dp4,p4,139)
++	call mxCopyReal8ToPtr(dp4,p4,139)
+ 	
+ 	return
+ 	end
+-C
+-C               Tennessee Eastman Process Control Test Problem
+-C
+-C                    James J. Downs and Ernest F. Vogel
+-C
+-C                  Process and Control Systems Engineering
+-C                        Tennessee Eastman Company
+-C                              P.O. Box 511
+-C                          Kingsport,TN  37662
+-C
+-C  Reference:
+-C    "A Plant-Wide Industrial Process Control Problem"
+-C    Presented at the AIChE 1990 Annual Meeting
+-C    Industrial Challenge Problems in Process Control,Paper #24a
+-C    Chicago,Illinois,November 14,1990
+-C
+-C  Subroutines:
+-C
+-C    TEFUNC - Function evaluator to be called by integrator
+-C    TEINIT - Initialization
+-C    TESUBi - Utility subroutines, i=1,2,..,8
+-C
+-C
+-C  The process simulation has 50 states (NN=50).  If the user wishes to
+-C  integrate additional states, NN must be increased accordingly in the
+-C  calling program.  The additional states should be appended to the end
+-C  of the YY vector, e.g. YY(51),...  The additional derivatives should
+-C  be appended to the end of the YP vector, e.g. YP(51),...  To initialize
+-C  the new states and to calculate derivatives for them, we suggest
+-C  creating new function evaluator and initialization routines as follows.
+-C
+-C          C-----------------------------------------------
+-C          C
+-C                SUBROUTINE FUNC(NN,TIME,YY,YP)
+-C          C
+-C                INTEGER NN
+-C                DOUBLE PRECISION TIME, YY(NN), YP(NN)
+-C          C
+-C          C  Call the function evaluator for the process
+-C          C
+-C                CALL TEFUNC(NN,TIME,YY,YP)
+-C          C
+-C          C  Calculate derivatives for additional states
+-C          C
+-C                YP(51) = ....
+-C                YP(52) = ....
+-C                   .
+-C                   .
+-C                   .
+-C                YP(NN) = ....
+-C          C
+-C                RETURN
+-C                END
+-C          C
+-C          C-----------------------------------------------
+-C          C
+-C                SUBROUTINE INIT(NN,TIME,YY,YP)
+-C          C
+-C                INTEGER NN
+-C                DOUBLE PRECISION TIME, YY(NN), YP(NN)
+-C          C
+-C          C  Call the initialization for the process
+-C          C
+-C                CALL TEINIT(NN,TIME,YY,YP)
+-C          C
+-C          C  Initialize additional states
+-C          C
+-C                YY(51) = ....
+-C                YY(52) = ....
+-C                   .
+-C                   .
+-C                   .
+-C                YY(NN) = ....
+-C          C
+-C                RETURN
+-C                END
+-C          C
+-C          C-----------------------------------------------
+-C
+-C  Differences between the code and its description in the paper:
+-C
+-C  1.  Subroutine TEINIT has TIME in the argument list.  TEINIT sets TIME
+-C      to zero.
+-C
+-C  2.  There are 8 utility subroutines (TESUBi) rather than 5.
+-C
+-C  3.  Process disturbances 14 through 20 do NOT need to be used in
+-C      conjunction with another disturbance as stated in the paper.  All
+-C      disturbances can be used alone or in any combination.
+-C
+-C
+-C  Manipulated Variables
+-C
+-C    XMV(1)     A Feed Flow (stream 1)
+-C    XMV(2)     D Feed Flow (stream 2)
+-C    XMV(3)     E Feed Flow (stream 3)
+-C    XMV(4)     A and C Feed Flow (stream 4)
+-C    XMV(5)     Compressor Recycle Valve
+-C    XMV(6)     Purge Valve (stream 9)
+-C    XMV(7)     Separator Pot Liquid Flow (stream 10)
+-C    XMV(8)     Stripper Liquid Product Flow (stream 11)
+-C    XMV(9)     Stripper Steam Valve
+-C    XMV(10)    Reactor Cooling Water Flow
+-C    XMV(11)    Condenser Cooling Water Flow
+-C    XMV(12)    Agitator Speed
+-C
+-C  Continuous Process Measurements
+-C
+-C    XMEAS(1)   A Feed  (stream 1)                    kscmh
+-C    XMEAS(2)   D Feed  (stream 2)                    kg/hr
+-C    XMEAS(3)   E Feed  (stream 3)                    kg/hr
+-C    XMEAS(4)   A and C Feed  (stream 4)              kscmh
+-C    XMEAS(5)   Recycle Flow  (stream 8)              kscmh
+-C    XMEAS(6)   Reactor Feed Rate  (stream 6)         kscmh
+-C    XMEAS(7)   Reactor Pressure                      kPa gauge
+-C    XMEAS(8)   Reactor Level                         %
+-C    XMEAS(9)   Reactor Temperature                   Deg C
+-C    XMEAS(10)  Purge Rate (stream 9)                 kscmh
+-C    XMEAS(11)  Product Sep Temp                      Deg C
+-C    XMEAS(12)  Product Sep Level                     %
+-C    XMEAS(13)  Prod Sep Pressure                     kPa gauge
+-C    XMEAS(14)  Prod Sep Underflow (stream 10)        m3/hr
+-C    XMEAS(15)  Stripper Level                        %
+-C    XMEAS(16)  Stripper Pressure                     kPa gauge
+-C    XMEAS(17)  Stripper Underflow (stream 11)        m3/hr
+-C    XMEAS(18)  Stripper Temperature                  Deg C
+-C    XMEAS(19)  Stripper Steam Flow                   kg/hr
+-C    XMEAS(20)  Compressor Work                       kW
+-C    XMEAS(21)  Reactor Cooling Water Outlet Temp     Deg C
+-C    XMEAS(22)  Separator Cooling Water Outlet Temp   Deg C
+-C
+-C  Sampled Process Measurements
+-C
+-C    Reactor Feed Analysis (Stream 6)
+-C        Sampling Frequency = 0.1 hr
+-C        Dead Time = 0.1 hr
+-C        Mole %
+-C    XMEAS(23)   Component A
+-C    XMEAS(24)   Component B
+-C    XMEAS(25)   Component C
+-C    XMEAS(26)   Component D
+-C    XMEAS(27)   Component E
+-C    XMEAS(28)   Component F
+-C
+-C    Purge Gas Analysis (Stream 9)
+-C        Sampling Frequency = 0.1 hr
+-C        Dead Time = 0.1 hr
+-C        Mole %
+-C    XMEAS(29)   Component A
+-C    XMEAS(30)   Component B
+-C    XMEAS(31)   Component C
+-C    XMEAS(32)   Component D
+-C    XMEAS(33)   Component E
+-C    XMEAS(34)   Component F
+-C    XMEAS(35)   Component G
+-C    XMEAS(36)   Component H
+-C
+-C    Product Analysis (Stream 11)
+-C        Sampling Frequency = 0.25 hr
+-C        Dead Time = 0.25 hr
+-C        Mole %
+-C    XMEAS(37)   Component D
+-C    XMEAS(38)   Component E
+-C    XMEAS(39)   Component F
+-C    XMEAS(40)   Component G
+-C    XMEAS(41)   Component H
+-C
+-C  Process Disturbances
+-C
+-C    IDV(1)   A/C Feed Ratio, B Composition Constant (Stream 4)          Step
+-C    IDV(2)   B Composition, A/C Ratio Constant (Stream 4)               Step
+-C    IDV(3)   D Feed Temperature (Stream 2)                              Step
+-C    IDV(4)   Reactor Cooling Water Inlet Temperature                    Step
+-C    IDV(5)   Condenser Cooling Water Inlet Temperature                  Step
+-C    IDV(6)   A Feed Loss (Stream 1)                                     Step
+-C    IDV(7)   C Header Pressure Loss - Reduced Availability (Stream 4)   Step
+-C    IDV(8)   A, B, C Feed Composition (Stream 4)            Random Variation
+-C    IDV(9)   D Feed Temperature (Stream 2)                  Random Variation
+-C    IDV(10)  C Feed Temperature (Stream 4)                  Random Variation
+-C    IDV(11)  Reactor Cooling Water Inlet Temperature        Random Variation
+-C    IDV(12)  Condenser Cooling Water Inlet Temperature      Random Variation
+-C    IDV(13)  Reaction Kinetics                                    Slow Drift
+-C    IDV(14)  Reactor Cooling Water Valve                            Sticking
+-C    IDV(15)  Condenser Cooling Water Valve                          Sticking
+-C    IDV(16)  Unknown
+-C    IDV(17)  Unknown
+-C    IDV(18)  Unknown
+-C    IDV(19)  Unknown
+-C    IDV(20)  Unknown
+-C
+-C
++
+ C=============================================================================
+ C
+ 
+@@ -612,7 +355,32 @@ C
+ C           YP   = Current derivative values
+ C
+       DOUBLE PRECISION YY(NN),YP(NN)
+-	include 'TEcommon.inc'
++
++
++C  MEASUREMENT AND VALVE COMMON BLOCK
++C
++      DOUBLE PRECISION XMEAS, XMV
++      COMMON/PV/ XMEAS(51), XMV(12)
++C
++C   DISTURBANCE VECTOR COMMON BLOCK
++C
++      INTEGER IDV,isd
++      COMMON/DVEC/ IDV(21)
++	equivalence (idv(21),isd)
++	
++c	NOTE: I have included isd in the /IDV/ common.  This is set
++c		non-zero when the process is shutting down.
++c		Output XMEAS(42) is for cost [cents/kmol product].
++c		Output XMEAS(43) is production rate of G [kmol G generated/h]
++c		Output XMEAS(44) is production rate of H [kmol H generated/h]
++c		Output XMEAS(45) is production rate of F [kmol F generated/h]
++c		Output XMEAS(46) is partial pressure of A in reactor [kPa]
++c		Output XMEAS(47) is partial pressure of C in reactor [kPa]
++c		Output XMEAS(48) is partial pressure of D in reactor [kPa]
++c		Output XMEAS(49) is partial pressure of E in reactor [kPa]
++c		Output XMEAS(50) is true (delay free) mole % G in product
++c		Output XMEAS(51) is true (delay free) mole % H in product
++
+       DOUBLE PRECISION
+      .UCLR,UCVR,UTLR,UTVR,
+      .XLR,XVR,ETR,ESR,
+@@ -737,6 +505,7 @@ C
+      .SPWLK,
+      .TESUB7,
+      .TESUB8
++     
+       DO 500 I=1,20
+       IF(IDV(I).GT.0)THEN
+       IDV(I)=1
+@@ -925,6 +694,18 @@ C
+       CRXR(6)=RR(3)+RR(4)
+       CRXR(7)=RR(1)
+       CRXR(8)=RR(2)
++
++c	Next 7 lines inserted by NL Ricker to define reaction rate
++c	and partial pressure outputs
++
++	xmeas(43)=rr(1)*0.454
++	xmeas(44)=rr(2)*0.454
++	xmeas(45)=rr(3)*0.454
++	xmeas(46)=ppr(1)/760.*101.325
++	xmeas(47)=ppr(3)/760.*101.325
++	xmeas(48)=ppr(4)/760.*101.325
++	xmeas(49)=ppr(5)/760.*101.325
++
+       RH=RR(1)*HTR(1)+RR(2)*HTR(2)
+       XMWS(1)=0.0
+       XMWS(2)=0.0
+@@ -1133,6 +914,13 @@ C
+       XCMP(39)=XST(6,13)*100.0
+       XCMP(40)=XST(7,13)*100.0
+       XCMP(41)=XST(8,13)*100.0
++
++c	Next 2 lines inserted by N. L. Ricker to define delay
++c	and noise-free product composition outputs
++
++	xmeas(50)=xcmp(40)
++	xmeas(51)=xcmp(41)
++	
+       IF(TIME.EQ.0.D0)THEN
+       DO 7010 I=23,41
+       XDEL(I)=XCMP(I)
+@@ -1208,6 +996,32 @@ c		Here is the original version
+       IVST(7)=IDV(19)
+       IVST(8)=IDV(19)
+       IVST(9)=IDV(19)
++	
++c		All (noisy) measurements have been computed.  Now
++c		do the PI loops.
++
++	yp(51)=xmv(10) - xmeas(9)				! error in reactor temperature [C]
++	yp(52)=xmv(11) - xmeas(11)				! error in separator temperature [C]
++	xmv(10)=41.10581288-8.0*(yp(51) + 8.0*yy(51))	! PI law for reactor temp control
++	xmv(11)=18.11349055-4.0*(yp(52) + 4.0*yy(52))	! PI law for separator temp control
++
++c		Prevent integral windup.
++
++	if (xmv(10) .le. 0.0 .and. yp(51) .gt. 0.0) then
++		xmv(10)=0.0
++		yp(51)=0.0
++	elseif (xmv(10) .ge. 100.0 .and. yp(51) .lt. 0.0) then
++		xmv(10)=100.0
++		yp(51)=0.0
++	end if
++	if (xmv(11) .le. 0.0 .and. yp(52) .gt. 0.0) then
++		xmv(11)=0.0
++		yp(52)=0.0
++	elseif (xmv(11) .ge. 100.0 .and. yp(52) .lt. 0.0) then
++		xmv(11)=100.0
++		yp(52)=0.0
++	end if
++
+       DO 9020 I=1,12
+       IF(TIME.EQ.0.D0 .OR.
+      .DABS(VCV(I)-XMV(I)).GT.VST(I)*IVST(I))
+@@ -1240,10 +1054,31 @@ C           Time = Current time(hrs)
+ C           YY   = Current state values
+ C           YP   = Current derivative values
+ C
+-      DOUBLE PRECISION XMEAS,XMV
+-      COMMON/PV/XMEAS(41),XMV(12)
+-      INTEGER IDV
+-      COMMON/DVEC/IDV(20)
++
++C  MEASUREMENT AND VALVE COMMON BLOCK
++C
++      DOUBLE PRECISION XMEAS, XMV
++      COMMON/PV/ XMEAS(51), XMV(12)
++C
++C   DISTURBANCE VECTOR COMMON BLOCK
++C
++      INTEGER IDV,isd
++      COMMON/DVEC/ IDV(21)
++	equivalence (idv(21),isd)
++	
++c	NOTE: I have included isd in the /IDV/ common.  This is set
++c		non-zero when the process is shutting down.
++c		Output XMEAS(42) is for cost [cents/kmol product].
++c		Output XMEAS(43) is production rate of G [kmol G generated/h]
++c		Output XMEAS(44) is production rate of H [kmol H generated/h]
++c		Output XMEAS(45) is production rate of F [kmol F generated/h]
++c		Output XMEAS(46) is partial pressure of A in reactor [kPa]
++c		Output XMEAS(47) is partial pressure of C in reactor [kPa]
++c		Output XMEAS(48) is partial pressure of D in reactor [kPa]
++c		Output XMEAS(49) is partial pressure of E in reactor [kPa]
++c		Output XMEAS(50) is true (delay free) mole % G in product
++c		Output XMEAS(51) is true (delay free) mole % H in product
++
+       DOUBLE PRECISION G
+       COMMON/RANDSD/G
+       DOUBLE PRECISION

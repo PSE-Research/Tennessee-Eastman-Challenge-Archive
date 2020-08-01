@@ -7,6 +7,12 @@ Basic TEC Code
     + Add readme.md
     + Add f90 version of `teprob.f`: teprob.f90
     + Remove `tecommon.inc`, Merge its content into `teprob.f`.
+    + Add `te_mextc.diff`: diff between `teprob.f`+`te_mex.f` and `te_mextc2.fv4`
+        ```sh
+        cat te_mex.f > te_mex.fv3
+        cat teprob.f >> te_mex.fv3
+        git diff --no-index -- te_mex.fv3 te_mextc.fv4 > te_mextc.diff
+        ```
 
 + `teprob.f`: Some format adjust, keep the code untouched.
     + CRLF -> LF
