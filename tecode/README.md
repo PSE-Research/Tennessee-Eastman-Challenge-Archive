@@ -8,7 +8,7 @@ Basic TEC Code
     + Add f90 version of `teprob.f`: teprob.f90
     + Remove `tecommon.inc`, Merge its content into `teprob.f`.
 
-+ `teprob.f`
++ `teprob.f`: Some format adjust, keep the code untouched.
     + CRLF -> LF
     + Add more comments
     + copy and insert `tecommon.inc`
