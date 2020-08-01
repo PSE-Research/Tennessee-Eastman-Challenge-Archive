@@ -192,42 +192,76 @@
 !=============================================================================
 !
 
+
+!-----------------------------------------------------------------------
+!> Function Evaluator.
+!! 
+!!  ## Input
+!!      @param[in]  `nn`    Number of differential equations
+!!      @param[in]  `time`  Current time(hrs)
+!!      @param[in]  `yy`    Current state values
+!!      @param[out] `yp`    Current derivative values
+!!
+!!  ### common: 
+!!      + /pv/
+!!      + /dvec/
+!!      + /teproc/
+!!      + /wlk/
+!!      + /const/
+!!
 Subroutine tefunc(nn, time, yy, yp)
-!
-!       Function Evaluator
-!
-!         Inputs:
-!
-!           NN   = Number of differential equations
-!           Time = Current time(hrs)
-!           YY   = Current state values
-!
-!         Outputs:
-!
-!           YP   = Current derivative values
-!
     Double Precision yy(nn), yp(nn)
 !
 !  MEASUREMENT AND VALVE COMMON BLOCK
 !
     Double Precision xmeas, xmv
     Integer isd
-    Common /pv/xmeas(41), xmv(12), isd
+    Common /pv/ xmeas(41), xmv(12), isd
 !
 !   DISTURBANCE VECTOR COMMON BLOCK
 !
     Integer idv
-    Common /dvec/idv(20)
-    Double Precision uclr, ucvr, utlr, utvr, xlr, xvr, etr, esr, tcr, tkr, dlr, vlr, vvr, vtr, ptr, ppr, crxr, rr, rh, fwr, twr, qur, hwr, uar, ucls, ucvs, utls, utvs, xls, xvs, ets, ess, tcs, tks, dls, vls, vvs, vts, pts, pps, fws, tws, qus, hws, uclc, utlc, xlc, etc, esc, tcc, dlc, vlc, vtc, quc, ucvv, utvv, xvv, etv, esv, tcv, tkv, vtv, ptv, vcv, vrng, vtau, ftm, fcm, xst, xmws, hst, tst, sfr, cpflmx, cpprmx, cpdh, tcwr, tcws, htr, agsp, xdel, xns, tgas, tprod, vst
+    Common /dvec/ idv(20)
+    Double Precision uclr, ucvr, utlr, utvr, xlr, xvr, &
+        etr, esr, tcr, tkr, dlr, vlr, vvr, vtr, ptr, ppr, &
+        crxr, rr, rh, fwr, twr, qur, hwr, uar, ucls, ucvs, &
+        utls, utvs, xls, xvs, ets, ess, tcs, tks, dls, vls, &
+        vvs, vts, pts, pps, fws, tws, qus, hws, uclc, utlc, &
+        xlc, etc, esc, tcc, dlc, vlc, vtc, quc, ucvv, utvv, &
+        xvv, etv, esv, tcv, tkv, vtv, ptv, vcv, vrng, vtau, &
+        ftm, fcm, xst, xmws, hst, tst, sfr, cpflmx, cpprmx, &
+        cpdh, tcwr, tcws, htr, agsp, xdel, xns, tgas, tprod, vst
     Integer ivst
-    Common /teproc/uclr(8), ucvr(8), utlr, utvr, xlr(8), xvr(8), etr, esr, tcr, tkr, dlr, vlr, vvr, vtr, ptr, ppr(8), crxr(8), rr(4), rh, fwr, twr, qur, hwr, uar, ucls(8), ucvs(8), utls, utvs, xls(8), xvs(8), ets, ess, tcs, tks, dls, vls, vvs, vts, pts, pps(8), fws, tws, qus, hws, uclc(8), utlc, xlc(8), etc, esc, tcc, dlc, vlc, vtc, quc, ucvv(8), utvv, xvv(8), etv, esv, tcv, tkv, vtv, ptv, vcv(12), vrng(12), vtau(12), ftm(13), fcm(8, 13), xst(8, 13), xmws(13), hst(13), tst(13), sfr(8), cpflmx, cpprmx, cpdh, tcwr, tcws, htr(3), agsp, xdel(41), xns(41), tgas, tprod, vst(12), ivst(12)
+    Common /teproc/ uclr(8), ucvr(8), utlr, utvr, xlr(8), xvr(8), &
+        etr, esr, tcr, tkr, dlr, vlr, vvr, vtr, ptr, &
+        ppr(8), crxr(8), rr(4), rh, fwr, twr, qur, hwr, uar, &
+        ucls(8), ucvs(8), utls, utvs, xls(8), xvs(8), ets, ess, &
+        tcs, tks, dls, vls, vvs, vts, pts, pps(8), fws, tws, &
+        qus, hws, uclc(8), utlc, xlc(8), etc, esc, tcc, dlc, &
+        vlc, vtc, quc, ucvv(8), utvv, xvv(8), etv, esv, &
+        tcv, tkv, vtv, ptv, vcv(12), vrng(12), vtau(12), ftm(13), &
+        fcm(8, 13), xst(8, 13), xmws(13), hst(13), tst(13), sfr(8), &
+        cpflmx, cpprmx, cpdh, tcwr, tcws, htr(3), agsp, &
+        xdel(41), xns(41), tgas, tprod, vst(12), ivst(12)
     Integer idvwlk
-    Double Precision adist, bdist, cdist, ddist, tlast, tnext, hspan, hzero, sspan, szero, spspan
-    Common /wlk/adist(12), bdist(12), cdist(12), ddist(12), tlast(12), tnext(12), hspan(12), hzero(12), sspan(12), szero(12), spspan(12), idvwlk(12)
-    Double Precision avp, bvp, cvp, ah, bh, ch, ag, bg, cg, av, ad, bd, cd, xmw
-    Common /const/avp(8), bvp(8), cvp(8), ah(8), bh(8), ch(8), ag(8), bg(8), cg(8), av(8), ad(8), bd(8), cd(8), xmw(8)
+    Double Precision adist, bdist, cdist, ddist, tlast, tnext, &
+        hspan, hzero, sspan, szero, spspan
+    Common /wlk/ adist(12), bdist(12), cdist(12), ddist(12), &
+        tlast(12), tnext(12), hspan(12), hzero(12), &
+        sspan(12), szero(12), spspan(12), idvwlk(12)
+    Double Precision avp, bvp, cvp, ah, bh, ch, ag, bg, cg, &
+        av, ad, bd, cd, xmw
+    Common /const/ avp(8), bvp(8), cvp(8), ah(8), bh(8), ch(8), &
+        ag(8), bg(8), cg(8), av(8), ad(8), bd(8), cd(8), xmw(8)
     Integer nn, i
-    Double Precision rg, vpr, fin(8), time, flms, dlp, pr, flcoef, uas, uac, vovrl, uarlev, vpos(12), xmns, xcmp(41), tmpfac, r1f, r2f, hwlk, swlk, spwlk, tesub7, tesub8
+    Double Precision rg, vpr, fin(8), time, flms, dlp, pr, &
+        flcoef, uas, uac, vovrl, uarlev, vpos(12), &
+        xmns, xcmp(41), tmpfac, r1f, r2f, hwlk, swlk, spwlk, &
+        tesub7, tesub8
+
+!!  Function Body --------------------------------
+!
+! Limiting of Disturbance Activations
     Do i = 1, 20
         If (idv(i)>0) Then
             idv(i) = 1
@@ -235,6 +269,8 @@ Subroutine tefunc(nn, time, yy, yp)
             idv(i) = 0
         End If
     End Do
+
+! Assignment of Disturbance Activations
     idvwlk(1) = idv(8)
     idvwlk(2) = idv(8)
     idvwlk(3) = idv(9)
@@ -247,20 +283,40 @@ Subroutine tefunc(nn, time, yy, yp)
     idvwlk(10) = idv(17)
     idvwlk(11) = idv(18)
     idvwlk(12) = idv(20)
+
+! Recalculation of Disturbance Process Parameters - 
+!   Update (1 - 9/13 - 20)
+! 
     Do i = 1, 9
         If (time>=tnext(i)) Then
             hwlk = tnext(i) - tlast(i)
-            swlk = adist(i) + hwlk*(bdist(i)+hwlk*(cdist(i)+hwlk*ddist(i)))
-            spwlk = bdist(i) + hwlk*(2.D0*cdist(i)+3.D0*hwlk*ddist(i))
+            swlk  = adist(i) + hwlk * ( &
+                bdist(i)+hwlk*(cdist(i)+hwlk*ddist(i)) &
+            )
+            spwlk = bdist(i) + hwlk * ( &
+                2.D0*cdist(i)+3.D0*hwlk*ddist(i) &
+            )
             tlast(i) = tnext(i)
-            Call tesub5(swlk, spwlk, adist(i), bdist(i), cdist(i), ddist(i), tlast(i), tnext(i), hspan(i), hzero(i), sspan(i), szero(i), spspan(i), idvwlk(i))
+            Call tesub5(swlk, spwlk, &
+                    adist(i), bdist(i), cdist(i), ddist(i), &
+                    tlast(i), tnext(i), &
+                    hspan(i), hzero(i), sspan(i), szero(i), &
+                    spspan(i), idvwlk(i))
         End If
     End Do
+
+! Recalculation of Disturbance Process Parameters - 
+!   Determination of Processes to be Updated (10 - 12)
+! 
     Do i = 10, 12
         If (time>=tnext(i)) Then
             hwlk = tnext(i) - tlast(i)
-            swlk = adist(i) + hwlk*(bdist(i)+hwlk*(cdist(i)+hwlk*ddist(i)))
-            spwlk = bdist(i) + hwlk*(2.D0*cdist(i)+3.D0*hwlk*ddist(i))
+            swlk  = adist(i) + hwlk * ( &
+                bdist(i)+hwlk*(cdist(i)+hwlk*ddist(i)) &
+            )
+            spwlk = bdist(i) + hwlk * ( &
+                2.D0*cdist(i)+3.D0*hwlk*ddist(i) &
+            )
             tlast(i) = tnext(i)
             If (swlk>0.1D0) Then
                 adist(i) = swlk
@@ -279,6 +335,8 @@ Subroutine tefunc(nn, time, yy, yp)
             End If
         End If
     End Do
+
+! Initilization of Disturbance Processes Parameters
     If (time==0.D0) Then
         Do i = 1, 12
             adist(i) = szero(i)
@@ -289,6 +347,8 @@ Subroutine tefunc(nn, time, yy, yp)
             tnext(i) = 0.1D0
         End Do
     End If
+
+! Determination of Disturbed Values
     xst(1, 4) = tesub8(1, time) - idv(1)*0.03D0 - idv(2)*2.43719D-3
     xst(2, 4) = tesub8(2, time) + idv(2)*0.005D0
     xst(3, 4) = 1.D0 - xst(1, 4) - xst(2, 4)
@@ -298,6 +358,8 @@ Subroutine tefunc(nn, time, yy, yp)
     tcws = tesub8(6, time) + idv(5)*5.D0
     r1f = tesub8(7, time)
     r2f = tesub8(8, time)
+
+! Retrieving of Current States
     Do i = 1, 3
         ucvr(i) = yy(i)
         ucvs(i) = yy(i+9)
@@ -321,6 +383,8 @@ Subroutine tefunc(nn, time, yy, yp)
     Do i = 1, 12
         vpos(i) = yy(i+38)
     End Do
+
+! Calculation of Collective Holdup
     utlr = 0.0
     utls = 0.0
     utlc = 0.0
@@ -337,10 +401,13 @@ Subroutine tefunc(nn, time, yy, yp)
         xlc(i) = uclc(i)/utlc
         xvv(i) = ucvv(i)/utvv
     End Do
+
     esr = etr/utlr
     ess = ets/utls
     esc = etc/utlc
     esv = etv/utvv
+
+! Calculation of Temperatures
     Call tesub2(xlr, tcr, esr, 0)
     tkr = tcr + 273.15
     Call tesub2(xls, tcs, ess, 0)
@@ -348,17 +415,25 @@ Subroutine tefunc(nn, time, yy, yp)
     Call tesub2(xlc, tcc, esc, 0)
     Call tesub2(xvv, tcv, esv, 2)
     tkv = tcv + 273.15
+
+! Calculation of Densities
     Call tesub4(xlr, tcr, dlr)
     Call tesub4(xls, tcs, dls)
     Call tesub4(xlc, tcc, dlc)
+
+! Calculation of Volume of Liquid and Vapor Phase
     vlr = utlr/dlr
     vls = utls/dls
     vlc = utlc/dlc
     vvr = vtr - vlr
     vvs = vts - vls
+
     rg = 998.9
+
+! Calculation of Pressure
     ptr = 0.0
     pts = 0.0
+
     Do i = 1, 3
         ppr(i) = ucvr(i)*rg*tkr/vvr
         ptr = ptr + ppr(i)
@@ -373,17 +448,28 @@ Subroutine tefunc(nn, time, yy, yp)
         pps(i) = vpr*xls(i)
         pts = pts + pps(i)
     End Do
+
+! Calculation of Component Concentration in Vapor Phase 
+!   (Reactor and Separator)
     ptv = utvv*rg*tkv/vtv
     Do i = 1, 8
         xvr(i) = ppr(i)/ptr
         xvs(i) = pps(i)/pts
     End Do
+
+! Calculation of Collective Holdup of Components in Vapor Phase 
+!   (Reactor and Separator)
     utvr = ptr*vvr/rg/tkr
     utvs = pts*vvs/rg/tks
+
+! Calculation of Single Holdup of Components in Vapor Phase 
+!   (Reactor and Separator)
     Do i = 4, 8
         ucvr(i) = utvr*xvr(i)
         ucvs(i) = utvs*xvs(i)
     End Do
+
+! Reaction kinetics
     rr(1) = dexp(31.5859536-40000.0/1.987/tkr)*r1f
     rr(2) = dexp(3.00094014-20000.0/1.987/tkr)*r2f
     rr(3) = dexp(53.4060443-60000.0/1.987/tkr)
@@ -402,6 +488,8 @@ Subroutine tefunc(nn, time, yy, yp)
     Do i = 1, 4
         rr(i) = rr(i)*vvr
     End Do
+
+! Consumption and Creation of Components in Reactor
     crxr(1) = -rr(1) - rr(2) - rr(3)
     crxr(3) = -rr(1) - rr(2)
     crxr(4) = -rr(1) - 1.5D0*rr(4)
@@ -410,12 +498,14 @@ Subroutine tefunc(nn, time, yy, yp)
     crxr(7) = rr(1)
     crxr(8) = rr(2)
     rh = rr(1)*htr(1) + rr(2)*htr(2)
+
     xmws(1) = 0.0
     xmws(2) = 0.0
     xmws(6) = 0.0
     xmws(8) = 0.0
     xmws(9) = 0.0
     xmws(10) = 0.0
+
     Do i = 1, 8
         xst(i, 6) = xvv(i)
         xst(i, 8) = xvr(i)
@@ -423,6 +513,7 @@ Subroutine tefunc(nn, time, yy, yp)
         xst(i, 10) = xvs(i)
         xst(i, 11) = xls(i)
         xst(i, 13) = xlc(i)
+
         xmws(1) = xmws(1) + xst(i, 1)*xmw(i)
         xmws(2) = xmws(2) + xst(i, 2)*xmw(i)
         xmws(6) = xmws(6) + xst(i, 6)*xmw(i)
@@ -430,12 +521,14 @@ Subroutine tefunc(nn, time, yy, yp)
         xmws(9) = xmws(9) + xst(i, 9)*xmw(i)
         xmws(10) = xmws(10) + xst(i, 10)*xmw(i)
     End Do
+
     tst(6) = tcv
     tst(8) = tcr
     tst(9) = tcs
     tst(10) = tcs
     tst(11) = tcs
     tst(13) = tcc
+
     Call tesub1(xst(1,1), tst(1), hst(1), 1)
     Call tesub1(xst(1,2), tst(2), hst(2), 1)
     Call tesub1(xst(1,3), tst(3), hst(3), 1)
@@ -446,16 +539,19 @@ Subroutine tefunc(nn, time, yy, yp)
     hst(10) = hst(9)
     Call tesub1(xst(1,11), tst(11), hst(11), 0)
     Call tesub1(xst(1,13), tst(13), hst(13), 0)
+
     ftm(1) = vpos(1)*vrng(1)/100.0
     ftm(2) = vpos(2)*vrng(2)/100.0
     ftm(3) = vpos(3)*(1.D0-idv(6))*vrng(3)/100.0
     ftm(4) = vpos(4)*(1.D0-idv(7)*0.2D0)*vrng(4)/100.0 + 1.D-10
     ftm(11) = vpos(7)*vrng(7)/100.0
     ftm(13) = vpos(8)*vrng(8)/100.0
+
     uac = vpos(9)*vrng(9)*(1.D0+tesub8(9,time))/100.0
     fwr = vpos(10)*vrng(10)/100.0
     fws = vpos(11)*vrng(11)/100.0
     agsp = (vpos(12)+150.0)/100.0
+
     dlp = ptv - ptr
     If (dlp<0.0) dlp = 0.0
     flms = 1937.6D0*dsqrt(dlp)
@@ -472,14 +568,17 @@ Subroutine tefunc(nn, time, yy, yp)
     If (pr<1.0) pr = 1.0
     If (pr>cpprmx) pr = cpprmx
     flcoef = cpflmx/1.197D0
+
     flms = cpflmx + flcoef*(1.0-pr**3)
-    cpdh = flms*(tcs+273.15D0)*1.8D-6*1.9872D0*(ptv-pts)/(xmws(9)*pts)
+    cpdh = flms * (tcs+273.15D0) * 1.8D-6 * 1.9872D0 * (ptv-pts) &
+            / (xmws(9)*pts)
     dlp = ptv - pts
     If (dlp<0.0) dlp = 0.0
     flms = flms - vpos(5)*53.349D0*dsqrt(dlp)
     If (flms<1.D-3) flms = 1.D-3
     ftm(9) = flms/xmws(9)
     hst(9) = hst(9) + cpdh/ftm(9)
+
     Do i = 1, 8
         fcm(i, 1) = xst(i, 1)*ftm(1)
         fcm(i, 2) = xst(i, 2)*ftm(2)
@@ -492,6 +591,7 @@ Subroutine tefunc(nn, time, yy, yp)
         fcm(i, 11) = xst(i, 11)*ftm(11)
         fcm(i, 13) = xst(i, 13)*ftm(13)
     End Do
+
     If (ftm(11)>0.1) Then
         If (tcc>170.) Then
             tmpfac = tcc - 120.262
@@ -512,7 +612,8 @@ Subroutine tefunc(nn, time, yy, yp)
         sfr(6) = 0.999
         sfr(7) = 0.99
         sfr(8) = 0.98
-    End If
+    End If ! (ftm(11)>0.1)
+
     Do i = 1, 8
         fin(i) = 0.0
         fin(i) = fin(i) + fcm(i, 4)
@@ -541,6 +642,8 @@ Subroutine tefunc(nn, time, yy, yp)
         xst(i, 7) = xst(i, 6)
         fcm(i, 7) = fcm(i, 6)
     End Do
+
+! Calculation of Heat Transfer in Reactor
     If (vlr/7.8>50.0) Then
         uarlev = 1.0
     Else If (vlr/7.8<10.0) Then
@@ -548,12 +651,20 @@ Subroutine tefunc(nn, time, yy, yp)
     Else
         uarlev = 0.025*vlr/7.8 - 0.25
     End If
+
     uar = uarlev*(-0.5*agsp**2+2.75*agsp-2.5)*855490.D-6
     qur = uar*(twr-tcr)*(1.D0-0.35D0*tesub8(10,time))
+
+! Calculation of Heat Transfer in Condenser (Separator)
     uas = 0.404655*(1.0-1.0/(1.0+(ftm(8)/3528.73)**4))
     qus = uas*(tws-tst(8))*(1.D0-0.25D0*tesub8(11,time))
+
+! Calculation of Heat Transfer in Stripper
     quc = 0.D0
     If (tcc<100.) quc = uac*(100.0-tcc)
+
+
+! Setting of Measured Values
     xmeas(1) = ftm(3)*0.359/35.3145
     xmeas(2) = ftm(1)*xmws(1)*0.454
     xmeas(3) = ftm(2)*xmws(2)*0.454
@@ -577,6 +688,8 @@ Subroutine tefunc(nn, time, yy, yp)
     xmeas(20) = cpdh*0.29307D3
     xmeas(21) = twr
     xmeas(22) = tws
+
+! Checking of Shut-Down-Constraints
     isd = 0
     If (xmeas(7)>3000.0) isd = 1
     If (vlr/35.3145>24.0) isd = 1
@@ -586,12 +699,16 @@ Subroutine tefunc(nn, time, yy, yp)
     If (vls/35.3145<1.0) isd = 1
     If (vlc/35.3145>8.0) isd = 1
     If (vlc/35.3145<1.0) isd = 1
+
+! Adding of Measurement Noise
     If (time>0.0 .And. isd==0) Then
         Do i = 1, 22
             Call tesub6(xns(i), xmns)
             xmeas(i) = xmeas(i) + xmns
         End Do
     End If
+
+! Analyzer Outputs
     xcmp(23) = xst(1, 7)*100.0
     xcmp(24) = xst(2, 7)*100.0
     xcmp(25) = xst(3, 7)*100.0
@@ -611,6 +728,7 @@ Subroutine tefunc(nn, time, yy, yp)
     xcmp(39) = xst(6, 13)*100.0
     xcmp(40) = xst(7, 13)*100.0
     xcmp(41) = xst(8, 13)*100.0
+
     If (time==0.D0) Then
         Do i = 23, 41
             xdel(i) = xcmp(i)
@@ -619,6 +737,7 @@ Subroutine tefunc(nn, time, yy, yp)
         tgas = 0.1
         tprod = 0.25
     End If
+
     If (time>=tgas) Then
         Do i = 23, 36
             xmeas(i) = xdel(i)
@@ -628,6 +747,7 @@ Subroutine tefunc(nn, time, yy, yp)
         End Do
         tgas = tgas + 0.1
     End If
+
     If (time>=tprod) Then
         Do i = 37, 41
             xmeas(i) = xdel(i)
@@ -637,82 +757,140 @@ Subroutine tefunc(nn, time, yy, yp)
         End Do
         tprod = tprod + 0.25
     End If
+
+! Calculation of State Derivative
     Do i = 1, 8
-        yp(i) = fcm(i, 7) - fcm(i, 8) + crxr(i)
-        yp(i+9) = fcm(i, 8) - fcm(i, 9) - fcm(i, 10) - fcm(i, 11)
+        yp(i)    = fcm(i, 7)  - fcm(i, 8) + crxr(i)
+        yp(i+9)  = fcm(i, 8)  - fcm(i, 9) - fcm(i, 10) - fcm(i, 11)
         yp(i+18) = fcm(i, 12) - fcm(i, 13)
-        yp(i+27) = fcm(i, 1) + fcm(i, 2) + fcm(i, 3) + fcm(i, 5) + fcm(i, 9) - fcm(i, 6)
+        yp(i+27) = fcm(i, 1)  + fcm(i, 2) + fcm(i, 3) &
+                    + fcm(i, 5) + fcm(i, 9) - fcm(i, 6)
     End Do
     yp(9) = hst(7)*ftm(7) - hst(8)*ftm(8) + rh + qur
 
-!		Here is the "correct" version of the separator energy balance:
+!   Here is the "correct" version of the separator energy balance:
+!
+!	    YP(18) = HST(8)*FTM(8) - (HST(9)*FTM(9)-cpdh) 
+!               - HST(10)*FTM(10) - HST(11)*FTM(11) + QUS
+!
+!   Here is the original version
+!
+    yp(18) = hst(8)*ftm(8) - hst(9)*ftm(9) &
+            - hst(10)*ftm(10) - hst(11)*ftm(11) + qus
 
-!	YP(18)=HST(8)*FTM(8)-
-!    .(HST(9)*FTM(9)-cpdh)-
-!    .HST(10)*FTM(10)-
-!    .HST(11)*FTM(11)+
-!    .QUS
+    yp(27) = hst(4)*ftm(4) + hst(11)*ftm(11) &
+            - hst(5)*ftm(5) - hst(13)*ftm(13) + quc
 
-!		Here is the original version
+    yp(36) = hst(1)*ftm(1) + hst(2)*ftm(2) + hst(3)*ftm(3) &
+            + hst(5)*ftm(5) + hst(9)*ftm(9) - hst(6)*ftm(6)
 
-    yp(18) = hst(8)*ftm(8) - hst(9)*ftm(9) - hst(10)*ftm(10) - hst(11)*ftm(11) + qus
-
-    yp(27) = hst(4)*ftm(4) + hst(11)*ftm(11) - hst(5)*ftm(5) - hst(13)*ftm(13) + quc
-    yp(36) = hst(1)*ftm(1) + hst(2)*ftm(2) + hst(3)*ftm(3) + hst(5)*ftm(5) + hst(9)*ftm(9) - hst(6)*ftm(6)
     yp(37) = (fwr*500.53*(tcwr-twr)-qur*1.D6/1.8)/hwr
-    yp(38) = (fws*500.53*(tcws-tws)-qus*1.D6/1.8)/hws
+    yp(38) = (fws*500.53*(tcws-tws)-qus*1.D6/1.8)/ hws
+
     ivst(10) = idv(14)
     ivst(11) = idv(15)
     ivst(5) = idv(19)
     ivst(7) = idv(19)
     ivst(8) = idv(19)
     ivst(9) = idv(19)
+
     Do i = 1, 12
-        If (time==0.D0 .Or. dabs(vcv(i)-xmv(i))>vst(i)*ivst(i)) vcv(i) = xmv(i)
-        If (vcv(i)<0.0) vcv(i) = 0.0
-        If (vcv(i)>100.0) vcv(i) = 100.0
-        yp(i+38) = (vcv(i)-vpos(i))/vtau(i)
+        If ( time == 0.D0 &
+            .Or. dabs(vcv(i)-xmv(i)) > vst(i) * ivst(i) &
+        ) vcv(i) = xmv(i)
+        If (vcv(i) < 0.0)   vcv(i) = 0.0
+        If (vcv(i) > 100.0) vcv(i) = 100.0
+
+        yp(i+38) = (vcv(i)-vpos(i)) / vtau(i)
     End Do
+
     If (time>0.0 .And. isd/=0) Then
         Do i = 1, nn
             yp(i) = 0.0
         End Do
     End If
+
     Return
 End Subroutine tefunc
 
-!=============================================================================
-!
+
+!-----------------------------------------------------------------------
+!> Initialization TEP.
+!! 
+!!  ## Input
+!!      @param[in]  `nn`    Number of differential equations
+!!      @param[out] `time`  Current time(hrs)
+!!      @param[out] `yy`    Current state values
+!!      @param[out] `yp`    Current derivative values
+!!
+!!  ### common: 
+!!      + /pv/
+!!      + /dvec/
+!!      + /randsd/
+!!      + /teproc/
+!!      + /wlk/
+!!      + /const/
+!!
 Subroutine teinit(nn, time, yy, yp)
-!
-!       Initialization
-!
-!         Inputs:
-!
-!           NN   = Number of differential equations
-!
-!         Outputs:
-!
-!           Time = Current time(hrs)
-!           YY   = Current state values
-!           YP   = Current derivative values
-!
     Double Precision xmeas, xmv
-    Common /pv/xmeas(41), xmv(12)
+    Common /pv/ xmeas(41), xmv(12)
     Integer idv
-    Common /dvec/idv(20)
+    Common /dvec/ idv(20)
     Double Precision g
-    Common /randsd/g
-    Double Precision uclr, ucvr, utlr, utvr, xlr, xvr, etr, esr, tcr, tkr, dlr, vlr, vvr, vtr, ptr, ppr, crxr, rr, rh, fwr, twr, qur, hwr, uar, ucls, ucvs, utls, utvs, xls, xvs, ets, ess, tcs, tks, dls, vls, vvs, vts, pts, pps, fws, tws, qus, hws, uclc, utlc, xlc, etc, esc, tcc, dlc, vlc, vtc, quc, ucvv, utvv, xvv, etv, esv, tcv, tkv, vtv, ptv, vcv, vrng, vtau, ftm, fcm, xst, xmws, hst, tst, sfr, cpflmx, cpprmx, cpdh, tcwr, tcws, htr, agsp, xdel, xns, tgas, tprod, vst
+    Common /randsd/ g
+    Double Precision uclr, ucvr, utlr, utvr, xlr, xvr, etr, esr, &
+        tcr, tkr, dlr, vlr, vvr, vtr, ptr, ppr, crxr, rr, rh, &
+        fwr, twr, qur, hwr, uar, ucls, ucvs, utls, utvs, &
+        xls, xvs, ets, ess, tcs, tks, dls, vls, vvs, vts, &
+        pts, pps, fws, tws, qus, hws, uclc, utlc, xlc, &
+        etc, esc, tcc, dlc, vlc, vtc, quc, ucvv, utvv, xvv, &
+        etv, esv, tcv, tkv, vtv, ptv, vcv, vrng, vtau, ftm, fcm, &
+        xst, xmws, hst, tst, sfr, cpflmx, cpprmx, cpdh, tcwr, tcws, &
+        htr, agsp, xdel, xns, tgas, tprod, vst
     Integer ivst
-    Common /teproc/uclr(8), ucvr(8), utlr, utvr, xlr(8), xvr(8), etr, esr, tcr, tkr, dlr, vlr, vvr, vtr, ptr, ppr(8), crxr(8), rr(4), rh, fwr, twr, qur, hwr, uar, ucls(8), ucvs(8), utls, utvs, xls(8), xvs(8), ets, ess, tcs, tks, dls, vls, vvs, vts, pts, pps(8), fws, tws, qus, hws, uclc(8), utlc, xlc(8), etc, esc, tcc, dlc, vlc, vtc, quc, ucvv(8), utvv, xvv(8), etv, esv, tcv, tkv, vtv, ptv, vcv(12), vrng(12), vtau(12), ftm(13), fcm(8, 13), xst(8, 13), xmws(13), hst(13), tst(13), sfr(8), cpflmx, cpprmx, cpdh, tcwr, tcws, htr(3), agsp, xdel(41), xns(41), tgas, tprod, vst(12), ivst(12)
+    Common /teproc/ uclr(8), ucvr(8), utlr, utvr, xlr(8), xvr(8), &
+        etr, esr, tcr, tkr, dlr, vlr, vvr, vtr, ptr, ppr(8), &
+        crxr(8), rr(4), rh, fwr, twr, qur, hwr, uar, &
+        ucls(8), ucvs(8), utls, utvs, xls(8), xvs(8), &
+        ets, ess, tcs, tks, dls, vls, vvs, vts, pts, pps(8), &
+        fws, tws, qus, hws, uclc(8), utlc, xlc(8), etc, esc, &
+        tcc, dlc, vlc, vtc, quc, ucvv(8), utvv, xvv(8), etv, &
+        esv, tcv, tkv, vtv, ptv, vcv(12), vrng(12), vtau(12), &
+        ftm(13), fcm(8, 13), xst(8, 13), xmws(13), hst(13), &
+        tst(13), sfr(8), cpflmx, cpprmx, cpdh, tcwr, tcws, &
+        htr(3), agsp, xdel(41), xns(41), tgas, tprod, &
+        vst(12), ivst(12)
     Integer idvwlk
-    Double Precision adist, bdist, cdist, ddist, tlast, tnext, hspan, hzero, sspan, szero, spspan
-    Common /wlk/adist(12), bdist(12), cdist(12), ddist(12), tlast(12), tnext(12), hspan(12), hzero(12), sspan(12), szero(12), spspan(12), idvwlk(12)
-    Double Precision avp, bvp, cvp, ah, bh, ch, ag, bg, cg, av, ad, bd, cd, xmw
-    Common /const/avp(8), bvp(8), cvp(8), ah(8), bh(8), ch(8), ag(8), bg(8), cg(8), av(8), ad(8), bd(8), cd(8), xmw(8)
+    Double Precision adist, bdist, cdist, ddist, tlast, tnext, &
+        hspan, hzero, sspan, szero, spspan
+    Common /wlk/ adist(12), bdist(12), cdist(12), ddist(12), &
+        tlast(12), tnext(12), hspan(12), hzero(12), &
+        sspan(12), szero(12), spspan(12), idvwlk(12)
+    Double Precision avp, bvp, cvp, ah, bh, ch, &
+        ag, bg, cg, av, ad, bd, cd, xmw
+    Common /const/ avp(8), bvp(8), cvp(8), ah(8), bh(8), ch(8), &
+        ag(8), bg(8), cg(8), av(8), ad(8), bd(8), cd(8), xmw(8)
+
     Integer i, nn
     Double Precision yy(nn), yp(nn), time
+
+!! Common init seq
+!   1. Common /const/
+!   2. Common /pv/
+!   3. Common /teproc/
+!   4. Common /randsd/
+!   5. Common /dvec/
+!   6. Common /wlk/
+!
+
+! Init Common /const/ ---------------------------
+!   xmw(8)
+!   avp(8), bvp(8), cvp(8),
+!   ad(8), bd(8), cd(8),
+!   ah(8), bh(8), ch(8),
+!   av(8),
+!   ag(8), bg(8), cg(8),
+!
     xmw(1) = 2.0
     xmw(2) = 25.4
     xmw(3) = 28.0
@@ -721,6 +899,7 @@ Subroutine teinit(nn, time, yy, yp)
     xmw(6) = 48.0
     xmw(7) = 62.0
     xmw(8) = 76.0
+
     avp(1) = 0.0
     avp(2) = 0.0
     avp(3) = 0.0
@@ -745,6 +924,7 @@ Subroutine teinit(nn, time, yy, yp)
     cvp(6) = 265.5
     cvp(7) = 232.9
     cvp(8) = 249.6
+
     ad(1) = 1.0
     ad(2) = 1.0
     ad(3) = 1.0
@@ -769,6 +949,7 @@ Subroutine teinit(nn, time, yy, yp)
     cd(6) = -0.000233
     cd(7) = -0.000425
     cd(8) = -0.000150
+
     ah(1) = 1.0D-6
     ah(2) = 1.0D-6
     ah(3) = 1.0D-6
@@ -793,6 +974,7 @@ Subroutine teinit(nn, time, yy, yp)
     ch(6) = 1.94D-11
     ch(7) = 3.82D-12
     ch(8) = 2.62D-12
+
     av(1) = 1.0D-6
     av(2) = 1.0D-6
     av(3) = 1.0D-6
@@ -801,6 +983,7 @@ Subroutine teinit(nn, time, yy, yp)
     av(6) = 160.D-6
     av(7) = 225.D-6
     av(8) = 209.D-6
+
     ag(1) = 3.411D-6
     ag(2) = 0.3799D-6
     ag(3) = 0.2491D-6
@@ -825,6 +1008,10 @@ Subroutine teinit(nn, time, yy, yp)
     cg(6) = -3.12D-13
     cg(7) = 0.D0
     cg(8) = 0.D0
+!
+! END Init Common /const/ -----------------------
+
+
     yy(1) = 10.40491389
     yy(2) = 4.363996017
     yy(3) = 7.570059737
@@ -875,12 +1062,29 @@ Subroutine teinit(nn, time, yy, yp)
     yy(48) = 41.10581288
     yy(49) = 18.11349055
     yy(50) = 50.00000000
+
+
+! Init ----------------------------------------------------
+!   1. Common /pv/ xmv(12)
+!   2. Common /teproc/
+!       vcv(12), vst(12), ivst(12)
+! 
     Do i = 1, 12
+        ! Init Common /pv/ xmv(12)
         xmv(i) = yy(i+38)
+        ! Init Common /teproc/ vcv(12), vst(12), ivst(12)
         vcv(i) = xmv(i)
         vst(i) = 2.0D0
         ivst(i) = 0
     End Do
+
+! Init Common /teproc/
+!   vrng(12), vtr, vts, vtc, vtv, 
+!   htr(3), hwr, hws, sfr(8), 
+!   xst(8, 13), tst(13), 
+!   cpflmx, cpprmx, 
+!   vtau(12), xns(41), 
+!
     vrng(1) = 400.00
     vrng(2) = 400.00
     vrng(3) = 100.00
@@ -890,14 +1094,17 @@ Subroutine teinit(nn, time, yy, yp)
     vrng(9) = 0.03
     vrng(10) = 1000.
     vrng(11) = 1200.0
+
     vtr = 1300.0
     vts = 3500.0
     vtc = 156.5
     vtv = 5000.0
+
     htr(1) = 0.06899381054D0
     htr(2) = 0.05D0
     hwr = 7060.
     hws = 11138.
+
     sfr(1) = 0.99500
     sfr(2) = 0.99100
     sfr(3) = 0.99000
@@ -906,6 +1113,7 @@ Subroutine teinit(nn, time, yy, yp)
     sfr(6) = 0.93800
     sfr(7) = 5.80000D-02
     sfr(8) = 3.01000D-02
+
     xst(1, 1) = 0.0
     xst(2, 1) = 0.0001
     xst(3, 1) = 0.0
@@ -915,6 +1123,7 @@ Subroutine teinit(nn, time, yy, yp)
     xst(7, 1) = 0.0
     xst(8, 1) = 0.0
     tst(1) = 45.
+
     xst(1, 2) = 0.0
     xst(2, 2) = 0.0
     xst(3, 2) = 0.0
@@ -924,6 +1133,7 @@ Subroutine teinit(nn, time, yy, yp)
     xst(7, 2) = 0.0
     xst(8, 2) = 0.0
     tst(2) = 45.
+
     xst(1, 3) = 0.9999
     xst(2, 3) = 0.0001
     xst(3, 3) = 0.0
@@ -933,6 +1143,7 @@ Subroutine teinit(nn, time, yy, yp)
     xst(7, 3) = 0.0
     xst(8, 3) = 0.0
     tst(3) = 45.
+
     xst(1, 4) = 0.4850
     xst(2, 4) = 0.0050
     xst(3, 4) = 0.5100
@@ -942,8 +1153,10 @@ Subroutine teinit(nn, time, yy, yp)
     xst(7, 4) = 0.0
     xst(8, 4) = 0.0
     tst(4) = 45.
+
     cpflmx = 280275.
     cpprmx = 1.3
+
     vtau(1) = 8.
     vtau(2) = 8.
     vtau(3) = 6.
@@ -959,7 +1172,13 @@ Subroutine teinit(nn, time, yy, yp)
     Do i = 1, 12
         vtau(i) = vtau(i)/3600.
     End Do
+
+!
+! Init Common /randsd/ g
     g = 1431655765.D0
+! END Common /randsd/ g
+!
+
     xns(1) = 0.0012D0
     xns(2) = 18.000D0
     xns(3) = 22.000D0
@@ -1001,69 +1220,94 @@ Subroutine teinit(nn, time, yy, yp)
     xns(39) = 0.010D0
     xns(40) = 0.500D0
     xns(41) = 0.500D0
+! END Init Common /teproc/ ----------------------
+
+
+! Init Common /dvec/ idv(20)
     Do i = 1, 20
         idv(i) = 0
     End Do
+! END Init Common /dvec/ idv(20)
+
+
+! Init Common /wlk/ --------------------------------------------------
+!   hspan(12), hzero(12), sspan(12), szero(12), spspan(12), 
+!   tlast(12), tnext(12), adist(12), bdist(12), cdist(12), ddist(12),
+!
+! NOT Init: idvwlk(12),
+!
     hspan(1) = 0.2D0
     hzero(1) = 0.5D0
     sspan(1) = 0.03D0
     szero(1) = 0.485D0
     spspan(1) = 0.D0
+
     hspan(2) = 0.7D0
     hzero(2) = 1.0D0
     sspan(2) = .003D0
     szero(2) = .005D0
     spspan(2) = 0.D0
+
     hspan(3) = 0.25D0
     hzero(3) = 0.5D0
     sspan(3) = 10.D0
     szero(3) = 45.D0
     spspan(3) = 0.D0
+
     hspan(4) = 0.7D0
     hzero(4) = 1.0D0
     sspan(4) = 10.D0
     szero(4) = 45.D0
     spspan(4) = 0.D0
+
     hspan(5) = 0.15D0
     hzero(5) = 0.25D0
     sspan(5) = 10.D0
     szero(5) = 35.D0
     spspan(5) = 0.D0
+
     hspan(6) = 0.15D0
     hzero(6) = 0.25D0
     sspan(6) = 10.D0
     szero(6) = 40.D0
     spspan(6) = 0.D0
+
     hspan(7) = 1.D0
     hzero(7) = 2.D0
     sspan(7) = 0.25D0
     szero(7) = 1.0D0
     spspan(7) = 0.D0
+
     hspan(8) = 1.D0
     hzero(8) = 2.D0
     sspan(8) = 0.25D0
     szero(8) = 1.0D0
     spspan(8) = 0.D0
+
     hspan(9) = 0.4D0
     hzero(9) = 0.5D0
     sspan(9) = 0.25D0
     szero(9) = 0.0D0
     spspan(9) = 0.D0
+
     hspan(10) = 1.5D0
     hzero(10) = 2.0D0
     sspan(10) = 0.0D0
     szero(10) = 0.0D0
     spspan(10) = 0.D0
+
     hspan(11) = 2.0D0
     hzero(11) = 3.0D0
     sspan(11) = 0.0D0
     szero(11) = 0.0D0
     spspan(11) = 0.D0
+    
     hspan(12) = 1.5D0
     hzero(12) = 2.0D0
     sspan(12) = 0.0D0
     szero(12) = 0.0D0
     spspan(12) = 0.D0
+
     Do i = 1, 12
         tlast(i) = 0.D0
         tnext(i) = 0.1D0
@@ -1072,10 +1316,14 @@ Subroutine teinit(nn, time, yy, yp)
         cdist(i) = 0.D0
         ddist(i) = 0.D0
     End Do
+! END Init Common /wlk/ -----------------------
+
     time = 0.0
     Call tefunc(nn, time, yy, yp)
+
     Return
 End Subroutine teinit
+
 
 !=============================================================================
 !     TESUBi - Utility subroutines, i=1,2,..,8
