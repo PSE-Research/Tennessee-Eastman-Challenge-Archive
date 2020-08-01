@@ -680,8 +680,7 @@ Subroutine tefunc(nn, time, yy, yp)
     End If
     Return
 End Subroutine tefunc
-!     END SUBROUTINE TEFUNC
-!
+
 !=============================================================================
 !
 Subroutine teinit(nn, time, yy, yp)
@@ -1077,8 +1076,7 @@ Subroutine teinit(nn, time, yy, yp)
     Call tefunc(nn, time, yy, yp)
     Return
 End Subroutine teinit
-!     END SUBROUTINE TEINIT
-!
+
 !=============================================================================
 !     TESUBi - Utility subroutines, i=1,2,..,8
 !
@@ -1112,8 +1110,7 @@ Subroutine tesub1(z, t, h, ity)
     End If
     Return
 End Subroutine tesub1
-!     END SUBROUTINE TESUB1
-!
+
 !-----------------------------------------------------------------------
 !     TESUB2(Z,T,H,ITY)
 !
@@ -1134,8 +1131,7 @@ Subroutine tesub2(z, t, h, ity)
     t = tin
     300 Return
 End Subroutine tesub2
-!     END SUBROUTINE TESUB2
-!
+
 !-----------------------------------------------------------------------
 !     TESUB3(Z,T,DH,ITY)
 !
@@ -1165,8 +1161,7 @@ Subroutine tesub3(z, t, dh, ity)
     End If
     Return
 End Subroutine tesub3
-!     END SUBROUTINE TESUB3
-!
+
 !-----------------------------------------------------------------------
 !     TESUB4(X,T,R)
 !
@@ -1182,8 +1177,7 @@ Subroutine tesub4(x, t, r)
     r = 1.0/v
     Return
 End Subroutine tesub4
-!     END SUBROUTINE TESUB4
-!
+
 !-----------------------------------------------------------------------
 !     TESUB5(S,SP,ADIST,BDIST,CDIST,DDIST,TLAST,
 !    .TNEXT,HSPAN,HZERO,SSPAN,SZERO,SPSPAN,IDVFLAG)
@@ -1202,8 +1196,7 @@ Subroutine tesub5(s, sp, adist, bdist, cdist, ddist, tlast, tnext, hspan, hzero,
     tnext = tlast + h
     Return
 End Subroutine tesub5
-!     END SUBROUTINE TESUB5
-!
+
 !-----------------------------------------------------------------------
 !     TESUB6(STD,X)
 !
@@ -1217,8 +1210,7 @@ Subroutine tesub6(std, x)
     x = (x-6.D0)*std
     Return
 End Subroutine tesub6
-!     END SUBROUTINE TESUB6
-!
+
 !-----------------------------------------------------------------------
 !     TESUB7(I)
 !
@@ -1231,8 +1223,7 @@ Double Precision Function tesub7(i)
     If (i<0) tesub7 = 2.D0*g/4294967296.D0 - 1.D0
     Return
 End Function tesub7
-!     END FUNCTION TESUB7
-!
+
 !-----------------------------------------------------------------------
 !     TESUB8(I,T)
 !
