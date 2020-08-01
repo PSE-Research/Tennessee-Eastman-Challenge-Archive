@@ -1,0 +1,7 @@
+# output
+*.txt
+*.dat
+*.csv
+
+# main function
+temain.f*

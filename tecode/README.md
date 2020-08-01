@@ -4,10 +4,11 @@ Basic TEC Code
 ## Change log
 
 + About files
-    + Add readme.md
-    + Add f90 version of `teprob.f`: teprob.f90
+    + Add `readme.md`
+    + Add f90 version of `teprob.f`: `teprob.f90`
     + Remove `tecommon.inc`, Merge its content into `teprob.f`.
-    + Add `te_mextc.diff`: diff between `teprob.f`+`te_mex.f` and `te_mextc2.fv4`
+    + Add `te_mextc.diff`: diff between original `teprob.f`+`te_mex.f` and `te_mextc2.fv4`
+        Note: The following files are in their original, unmodified versions.
         ```sh
         cat te_mex.f > te_mex.fv3
         cat teprob.f >> te_mex.fv3
@@ -17,10 +18,13 @@ Basic TEC Code
 + `teprob.f`: Some format adjust, keep the code untouched.
     + CRLF -> LF
     + Add more comments
-    + copy and insert `tecommon.inc`
+    + Copy and insert `tecommon.inc`
     + Adjust indent, keep use f77 format
 
-+ `teprob.f90`
++ `teprob.f90`: Equivalent to the original f77 version (`teprob.f`), but more easier to read.
+    + Add a lot of comments
+    + Keep a line < 73 chars
+    + Indent adjusted to make it easier to read
 
 
 ## Original notes
