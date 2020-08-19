@@ -11,7 +11,7 @@ Also, we can add some faults such as temperature, pressure saltation, pump shutd
 > Also, it's better not to put binary files in the repository.
 >
 > There are lots of binary files, such as: PDF, ZIP, MEX(dll) and etc, in camaramm's repository.
-> But the original repository is a static archive of the "Tennessee Eastman Challenge" in Washington.edu. 
+> But the original repository is a static archive of the "Tennessee Eastman Challenge". 
 > We'd better keep all those files untouched. 
 >
 > So, I decided to open a new repository for those goals, rather than fork it explicitly, and we keep using the same MIT license.
@@ -22,9 +22,9 @@ Also, we can add some faults such as temperature, pressure saltation, pump shutd
 ## Useful links
 
 + [Tennessee Eastman Challenge Archive - Prof. N. L. Ricker | washington.edu][washington-teca]
-+ [camaramm/tennessee-eastman-challenge | github][camaramm-tec]
++ [camaramm/tennessee-eastman-challenge | github][camaramm-tec]  
     TECA on github.
-- [camaramm/tennessee-eastman-profBraatz | github][camaramm-te-braatz]
+- [camaramm/tennessee-eastman-profBraatz | github][camaramm-te-braatz]  
     The Fortran 77 codes for the open-loop and the closed-loop simulations for the Tennessee Eastman process (TEP) as well as the training and testing data files used for evaluating the data-driven methods (PCA, PLS, FDA, and CVA).
 
 
